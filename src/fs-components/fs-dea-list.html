@@ -114,6 +114,7 @@
                 <div class="item">
                     <div class="pad">
                         <div class="primary">Adress: [[dea.adresse]]</div>
+                        <span>distance: [[dea.distance]]</span>
                         <span>batiment: [[dea.batiment]]</span>
                         <span>modele: [[dea.modele]]</span>
                         <span>source: [[dea.source]]</span>
@@ -196,10 +197,11 @@
                         // Instantiate a directions service.
                         // var directionsService = new google.maps.DirectionsService;
 
+                        dea.distance = 2;
                         deaDetailedList.push(dea);
 
+                        // deaDetailedList.push()
                     })
-
                     this.deaDetailedList = deaDetailedList;
                 }
             }
