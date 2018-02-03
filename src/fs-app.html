@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="fs-icons.html">
 <link rel="import" href="redux-mixin.html">
 <link rel="import" href="data/fs-database-loading.html">
@@ -54,6 +55,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       app-header paper-icon-button {
         --paper-icon-button-ink-color: white;
+      }
+
+      paper-button.emergency {
+        background-color: red;
       }
 
       .drawer-list {
@@ -109,8 +114,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
+            <div main-title style="width:100%;">[[appName]]</div>
+            <!-- <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button> -->
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>My App</div>
+            <a href="tel:18196684976"><paper-button class="emergency">911</paper-button></a>
           </app-toolbar>
         </app-header>
 
@@ -141,6 +148,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             type: String,
             reflectToAttribute: true,
             observer: '_pageChanged',
+          },
+          appName: {
+            type: String,
+            statePath: 'appInfo.appName',
           },
           routeData: Object,
           subroute: String,
