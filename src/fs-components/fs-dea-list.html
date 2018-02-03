@@ -2,6 +2,11 @@
 <link rel="import" href="../redux-mixin.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 
 <dom-module id="fs-dea-list">
     <template>
@@ -12,22 +17,6 @@
                 display: block;
             }
 
-            app-toolbar {
-                background-color: var(--google-green-700);
-                box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
-                font-weight: bold;
-                color: white;
-                font-size: 18px;
-                z-index: 1;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-            }
-
-            app-toolbar paper-icon-button {
-                --paper-icon-button-ink-color: white;
-            }
 
             iron-list {
                 padding-top: 64px;
@@ -69,31 +58,31 @@
                 font-weight: bold;
             }
 
-            .shortText,
-            .longText {
+            .shortInfo,
+            .detailInfo {
                 font-size: 14px;
             }
 
-            .longText {
+            .detailInfo {
                 color: gray;
                 display: none;
             }
 
-            .item:hover .shortText::after {
+            .item:hover .shortInfo::after {
                 content: ' [+]';
                 color: gray;
             }
 
-            .item.expanded:hover .shortText::after {
+            .item.expanded:hover .shortInfo::after {
                 content: '';
             }
 
-            .item.expanded .longText {
+            .item.expanded .detailInfo {
                 display: block;
             }
 
-            .item.expanded:hover .longText::after {
-                content: ' [–]';
+            .item.expanded:hover .detailInfo::after {
+                content: '';
             }
 
             .spacer {
@@ -107,16 +96,21 @@
             }
         </style>
 
-      
+
+
         <!-- HTML template here -->
-        <iron-list items="[[deaList]]" as="dea">
+        <iron-list items="[[deaList]]" as="dea" selection-enabled multi-selection>
             <template>
-                <div class="item">
-                    <div class="pad">
-                        <div class="primary">Adress: [[dea.adresse]]</div>
-                        <span>batiment: [[dea.batiment]]</span>
-                        <span>modele: [[dea.modele]]</span>
-                        <span>source: [[dea.source]]</span>
+                <div>
+                    <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
+                        <div class="pad">
+                            <div class="primary">Adress: [[dea.adresse]]</div>
+                            <span class="shortInfo">Open</span>
+                            <span class="detailInfo">batiment: [[dea.batiment]]</span>
+                            <span class="detailInfo">modele: [[dea.modele]]</span>
+                            <span class="detailInfo">source: [[dea.source]]</span>
+                        </div>
+                        <iron-icon src="../../images/phone.png"></iron-icon>
                     </div>
                 </div>
             </template>
@@ -164,7 +158,8 @@
                         deaList: {
                             type: Array,
                             value: [],
-                            statePath: "deaLocations"
+                            statePath: "deaLocations",
+                            oberver: "distance"
                         },
                         userLocation: {
                             type: String,
@@ -181,12 +176,24 @@
                   */
                 _doSomething(param) { }
 
+                distance(newvalue) {
+                    this.deaList.forEach()
+                }
+
                 userLocationChange(newValue, oldValue) {
-                    this.deaList.forEach((dea) => {
-                        // Instantiate a directions service.
-                        var directionsService = new google.maps.DirectionsService;
+                    this.deaList.forEach((statePath) => {
+
+
                     })
                 }
+
+                getClassForItem(item, selected) {
+                    return selected ? 'item expanded' : 'item';
+                }
+
+
+
+
             }
 
             // Registers the element in the browser

@@ -20,7 +20,8 @@
     "paper-button": "PolymerElements/paper-button#^2.0.0",
     "iron-list": "PolymerElements/iron-list#^2.0.12",
     "i18n-element": "t2ym/i18n-element#^2.0.1",
-    "google-map": "GoogleWebComponents/google-map#^2.0.3"
+    "google-map": "GoogleWebComponents/google-map#^2.0.3",
+    "google-apis": "GoogleWebComponents/google-apis#^2.0.1"
   },
   "resolutions": {
     "polymer": "^2.0.0"
