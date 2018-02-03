@@ -1,0 +1,193 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+
+<dom-module id="fs-dea-list">
+    <template>
+
+        <!-- Styling here -->
+        <style>
+            :host {
+                display: block;
+            }
+
+            app-toolbar {
+                background-color: var(--google-green-700);
+                box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
+                font-weight: bold;
+                color: white;
+                font-size: 18px;
+                z-index: 1;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+            }
+
+            app-toolbar paper-icon-button {
+                --paper-icon-button-ink-color: white;
+            }
+
+            iron-list {
+                padding-top: 64px;
+                --iron-list-items-container: {
+                    max-width: 800px;
+                    margin: auto;
+                    margin-top: 60px;
+                    margin-bottom: 60px;
+                    border-bottom: 1px solid #ddd;
+                }
+                ;
+            }
+
+            .item {
+                @apply --layout-horizontal;
+                padding: 20px;
+                background-color: white;
+                border: 1px solid #ddd;
+                cursor: pointer;
+                margin-bottom: 10px;
+            }
+
+            .avatar {
+                height: 40px;
+                width: 40px;
+                border-radius: 20px;
+                box-sizing: border-box;
+                background-color: #DDD;
+            }
+
+            .pad {
+                padding: 0 16px;
+                @apply --layout-flex;
+                @apply --layout-vertical;
+            }
+
+            .primary {
+                font-size: 16px;
+                font-weight: bold;
+            }
+
+            .shortText,
+            .longText {
+                font-size: 14px;
+            }
+
+            .longText {
+                color: gray;
+                display: none;
+            }
+
+            .item:hover .shortText::after {
+                content: ' [+]';
+                color: gray;
+            }
+
+            .item.expanded:hover .shortText::after {
+                content: '';
+            }
+
+            .item.expanded .longText {
+                display: block;
+            }
+
+            .item.expanded:hover .longText::after {
+                content: ' [–]';
+            }
+
+            .spacer {
+                @apply --layout-flex;
+            }
+
+            @media (max-width: 460px) {
+                paper-toolbar .bottom.title {
+                    font-size: 14px;
+                }
+            }
+        </style>
+
+        <!-- HTML template here -->
+        <iron-list items="[[deaList]]" as="dea">
+            <template>
+                <div class="item">
+                    <div class="pad">
+                        <div class="primary">Adress: [[dea.adresse]]</div>
+                        <span>batiment: [[dea.batiment]]</span>
+                        <span>modele: [[dea.modele]]</span>
+                        <span>source: [[dea.source]]</span>
+                    </div>
+                </div>
+            </template>
+        </iron-list>
+    </template>
+
+    <script>
+        (function () { // IIFE
+          
+            const userLocation ={
+                latidude:-72.6822718,
+                longitude: 46.6204874
+            }; 
+            /**
+             * Class to be used as a Template for new elements
+             * @polymer
+             */
+            class FSDeaList extends ReduxMixin(Polymer.Element) { // Custom element definition
+
+                /**
+                 * Defines the name of the element: <fs-dea-list></fs-dea-list>.
+                 * @return {string} name that the element will use.
+                 */
+                static get is() { return 'fs-dea-list'; }
+
+                /**
+                 * Constructor => Lifecycle
+                 * Initialization of some things could be done here
+                 */
+                constructor() {
+                    super();
+                    // Initialize things here
+                }
+
+                /**
+                 * @return {object} properties- Polymer properties
+                 * Useage: <fs-dea-list
+                              prop1="something" >
+                           </fs-dea-list>
+                 */
+                static get properties() {
+                    return {
+                        deaList: {
+                            type: Array,
+                            value:[],
+                            statePath:"deaLocations"
+                        },
+                        userLocation: {
+                            type: String,
+                            value: userLocation,
+                            observer:"userLocationChange"
+                        }
+                    };
+                }
+
+
+                /**
+                  * Example of a protected method.
+                  * @param {string} param - Some parameter.
+                  */
+                _doSomething(param) { }
+
+                userLocationChange(newValue, oldValue) {
+                    this.deaList.forEach( (dea) => {
+                        //calculer
+                    })
+                }
+            }
+
+            // Registers the element in the browser
+            customElements.define(FSDeaList.is, FSDeaList);
+
+        })();
+    </script>
+
+</dom-module>
