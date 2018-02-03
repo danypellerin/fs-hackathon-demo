@@ -59,6 +59,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       paper-button.emergency {
         background-color: red;
+        padding: 0;
+      }
+
+      .urgence-container {
+        height: 100%;
+      }
+
+      .urgence-container a {
+        color: #FFFFFF;
+        text-decoration: none;
+        display: block;
+        height: 100%;
+      }
+
+      .urgence-container a paper-button {
+        height: 100%;
+        font-size: 37px;
       }
 
       .drawer-list {
@@ -117,7 +134,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <div main-title style="width:100%;">[[appName]]</div>
             <!-- <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button> -->
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <a href="tel:18196684976"><paper-button class="emergency">911</paper-button></a>
+            <div class="urgence-container">
+              <a href="tel:18196684976">
+                <paper-button class="emergency">911</paper-button>
+              </a>
+          </div>
           </app-toolbar>
         </app-header>
 
