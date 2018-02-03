@@ -109,7 +109,7 @@
 
       
         <!-- HTML template here -->
-        <iron-list items="[[deaList]]" as="dea">
+        <iron-list items="[[deaDetailedList]]" as="dea">
             <template>
                 <div class="item">
                     <div class="pad">
@@ -129,7 +129,7 @@
         (function () { // IIFE
 
             const userLocation = {
-                latidude: -72.6822718,
+                latitude: -72.6822718,
                 longitude: 46.6204874
             };
             /**
@@ -164,12 +164,17 @@
                         deaList: {
                             type: Array,
                             value: [],
-                            statePath: "deaLocations"
+                            statePath: "deaLocations",
+                            observer: "deaInfoChanged"
                         },
                         userLocation: {
                             type: String,
                             value: userLocation,
-                            observer: "userLocationChange"
+                            observer: "deaInfoChanged"
+                        },
+                        deaDetailedList: {
+                            type: Array,
+                            value: []
                         }
                     };
                 }
@@ -181,11 +186,21 @@
                   */
                 _doSomething(param) { }
 
-                userLocationChange(newValue, oldValue) {
+                deaInfoChanged(newValue, oldValue) {
+
+                    let deaList = this.deaList;
+                    let userLocation = this.userLocation;
+                    let deaDetailedList = [];
+
                     this.deaList.forEach((dea) => {
                         // Instantiate a directions service.
-                        var directionsService = new google.maps.DirectionsService;
+                        // var directionsService = new google.maps.DirectionsService;
+
+                        deaDetailedList.push(dea);
+
                     })
+
+                    this.deaDetailedList = deaDetailedList;
                 }
             }
 
