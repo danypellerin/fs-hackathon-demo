@@ -1,0 +1,139 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-rest-get">
+  <template>
+
+    <app-indexeddb-mirror
+				key="[[key]]"
+				data="{{data}}"
+				persisted-data="{{persistedData}}">
+    </app-indexeddb-mirror>
+
+  </template>
+
+  <script>
+    (function () {
+
+      /**
+       * Class to be used as a Template for new elements
+       * @polymer
+       */
+      class FSRestGet extends ReduxMixin(Polymer.Element) { // Custom element definition
+
+        /**
+         * Defines the name of the element: <fs-rest-get></fs-rest-get>.
+         * @return {string} name that the element will use.
+         */
+        static get is() { return 'fs-rest-get'; }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-rest-get
+                      url="something" >
+                   </fs-rest-get>
+         */
+        static get properties() {
+          return {
+            url: {
+              type: String,
+              value: ''
+            },
+            key: {
+              type: String
+            },
+            loadActionName: {
+              type: String
+            },
+            loadedActionName: {
+              type: String
+            },
+            data: {
+              type: Object
+            },
+            persistedData: {
+              type: Object,
+              observer: '_loadData',
+            },
+            loaded: {
+              type: Boolean,
+              value: false
+            },
+          };
+        }
+
+
+        /**
+         * Ready lifecycle
+         */
+         ready() {
+          super.ready();
+
+          if(_.isEmpty(this.url)) {
+            console.error('Url is undefined for fs-rest-get element');
+            return;
+          }
+
+          if(_.isEmpty(this.key)) {
+            console.error('Key is undefined for fs-rest-get element');
+            return;
+          }
+
+          if(_.isEmpty(this.loadActionName)) {
+            console.error('loadActionName is undefined for fs-rest-get element');
+            return;
+          }
+
+          if(_.isEmpty(this.loadedActionName)) {
+            console.warn('loadedActionName is undefined for fs-rest-get element.');
+          }
+
+          let state = this.getState();
+          if (state.appInfo.isNetworkOnline) {
+            fetch(this.url)
+              .then(response => response.json().then(json => this.data = json))
+              .then(reason => console);
+          } else {
+            this.addEventListener('state-changed', event => {
+              state = this.getState();
+              if(!this.loaded && state.appInfo.isNetworkOnline) {
+                fetch(this.url)
+                  .then(response => response.json().then(json => this.data = json))
+                  .then(reason => console);
+              }
+            });
+          }
+        }
+
+       /**
+         * Data loaded
+         * @param {*} data - Some parameter.
+         */
+         _loadData(data) {
+
+          if(!_.isEmpty(data)) {
+
+            this.loaded = true;
+
+            this.dispatch({
+              type: this.loadActionName,
+              value: data
+            });
+
+            if(!_.isEmpty(this.loadActionName)) {
+              this.dispatch({
+                type: this.loadedActionName,
+                value: true
+              });
+            }
+          }
+        }
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSRestGet.is, FSRestGet);
+
+    })();
+  </script>
+
+</dom-module>

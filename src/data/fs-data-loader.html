@@ -1,0 +1,114 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-data-loader">
+  <template>
+
+    <firebase-query
+				app-name="factora-hackathon-demo"
+				path="/[[key]]"
+				data="{{data}}">
+    </firebase-query>
+
+    <app-indexeddb-mirror
+				key="[[key]]"
+				data="{{data}}"
+				persisted-data="{{persistedData}}">
+    </app-indexeddb-mirror>
+
+  </template>
+
+  <script>
+    (function () {
+
+      /**
+       * Loads data that is forwarded to the stored
+       * @polymer
+       */
+      class FSDataLoader extends ReduxMixin(Polymer.Element) { // Custom element definition
+
+        /**
+         * Defines the name of the element: <fs-data-loader></fs-data-loader>.
+         * @return {string} name that the element will use.
+         */
+        static get is() { return 'fs-data-loader'; }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-data-loader
+         *            key="'myKey'"
+         *            load-action-name="'LOAD_MY_KEY'"
+         *            loaded-action-name="'MY_KEY_LOADED'">
+         *         </fs-data-loader>
+         */
+        static get properties() {
+          return {
+            key: {
+              type: String
+            },
+            loadActionName: {
+              type: String
+            },
+            loadedActionName: {
+              type: String
+            },
+            data: {
+              type: Object
+            },
+            persistedData: {
+              type: Object,
+              observer: '_loadData',
+            },
+          };
+        }
+
+        /**
+         * Ready lifecycle
+         */
+         ready() {
+          super.ready();
+
+          if(_.isEmpty(this.key)) {
+            console.error('Key is undefined for data-loader');
+          }
+          if(_.isEmpty(this.loadActionName)) {
+            console.error('Load action is undefined for data-loader');
+          }
+          if(_.isEmpty(this.loadedActionName)) {
+            console.warn('Loaded action is undefined for data-loader. Optional but recommended.');
+          }
+        }
+
+        /**
+         * Load data observer
+         */
+        _loadData(data) {
+
+          if(!_.isEmpty(data)) {
+
+            this.dispatch({
+              type: this.loadActionName,
+              value: data
+            });
+
+            if(!_.isEmpty(this.loadActionName)) {
+              this.dispatch({
+                type: this.loadedActionName,
+                value: true
+              });
+            }
+          }
+
+        }
+
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSDataLoader.is, FSDataLoader);
+
+    })();
+  </script>
+
+</dom-module>

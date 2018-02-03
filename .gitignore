@@ -1,0 +1,17 @@
+
+# Add any directories, files, or patterns you don't want to be tracked by version control
+# dependencies
+bower_components
+node_modules
+
+# compiled output
+dist
+build
+
+# IDEs
+.idea
+.vscode
+
+# misc
+.DS_Store
+npm-debug.log

@@ -1,0 +1,33 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/fs-app.html",
+  "fragments": [
+    "src/fs-view1.html",
+    "src/fs-view2.html",
+    "src/fs-view3.html",
+    "src/fs-view404.html"
+  ],
+  "sources": [
+    "src/**/*",
+    "images/**/*"
+  ],
+  "extraDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/*.js",
+    "bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror-worker.js"
+  ],
+  "lint": {
+    "rules": ["polymer-2"]
+  },
+  "builds": [
+    {
+      "preset": "es5-bundled"
+    },
+    {
+      "preset": "es6-bundled"
+    },
+    {
+      "preset": "es6-unbundled"
+    }
+  ]
+}

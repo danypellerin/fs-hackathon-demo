@@ -1,0 +1,70 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-custom-element">
+  <template>
+
+    <!-- Styling here -->
+    <style>
+       :host {
+        display: block;
+      }
+    </style>
+
+    <!-- HTML template here -->
+    <h2>Hello [[prop1]]!</h2>
+  </template>
+
+  <script>
+    (function () { // IIFE
+
+      /**
+       * Class to be used as a Template for new elements
+       * @polymer
+       */
+      class FSCustomElement extends ReduxMixin(Polymer.Element) { // Custom element definition
+
+        /**
+         * Defines the name of the element: <fs-custom-element></fs-custom-element>.
+         * @return {string} name that the element will use.
+         */
+        static get is() { return 'fs-custom-element'; }
+
+        /**
+         * Constructor => Lifecycle
+         * Initialization of some things could be done here
+         */
+        constructor() {
+          super();
+          // Initialize things here
+        }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-custom-element
+                      prop1="something" >
+                   </fs-custom-element>
+         */
+        static get properties() {
+          return {
+            prop1: {
+              type: String,
+              value: 'fs-custom-element'
+            }
+          };
+        }
+
+       /**
+         * Example of a protected method.
+         * @param {string} param - Some parameter.
+         */
+        _doSomething(param) { }
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSCustomElement.is, FSCustomElement);
+
+    })();
+  </script>
+
+</dom-module>

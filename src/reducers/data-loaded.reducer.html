@@ -1,0 +1,24 @@
+<script>
+(function() {
+
+    const initialState = {
+        membersLoaded: false
+    };
+
+    const dataLoadedReducer = (state = {}, action) => {
+
+        switch (action.type) {
+            case 'MEMBERS_LOADED':
+                return Object.assign({}, state, {
+                    membersLoaded: action.value
+                });
+
+            default:
+                return state;
+        }
+    };
+
+    App.reducers.dataLoaded = dataLoadedReducer;
+
+})();
+</script>

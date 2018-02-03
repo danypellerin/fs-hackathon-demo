@@ -1,0 +1,41 @@
+<link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
+<script src="../node_modules/redux/dist/redux.js"></script>
+<link rel="import" href="reducers/app-info.reducer.html">
+<link rel="import" href="reducers/members.reducer.html">
+<link rel="import" href="reducers/ui-state.reducer.html">
+<link rel="import" href="reducers/data-loaded.reducer.html">
+
+<script>
+
+    /* INSTRUCTIONS TO ADD SOMETHING TO THE STORE
+        - Create a reducer
+        - Import the reducer on top of this file
+        - Update the documentation of the AppState just below
+        - To load data on app load, add an <fs-data-loader></fs-data-loader> element
+          to the data/fs-database-loading.html file
+        - If data comes from Firebase, modify the database.rules.json to give public
+          access to the content if needed.
+    */
+
+    /*
+        AppState = {
+            appInfo: {
+                appName: 'Application démo de Factora pour le Hackathon',
+                isNetworkOnline: false
+            },
+            members: [],
+            uiState: {},
+            dataLoaded: {
+                membersLoaded: false
+            }
+        }
+    */
+
+    ReduxMixin = (function() {
+
+        const store = Redux.createStore(Redux.combineReducers(App.reducers));
+        return PolymerRedux(store);
+
+    })();
+
+</script>

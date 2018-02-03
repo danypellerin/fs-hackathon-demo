@@ -1,0 +1,26 @@
+<script>
+(function() {
+
+    const initialAppInfo =  {
+        appName: 'Application démo de Factora pour le Hackathon',
+        isNetworkOnline: false
+    };
+
+    const appInfoReducer = (state = initialAppInfo, action) => {
+
+        switch (action.type) {
+
+            case 'UPDATE_NETWORK_STATUS':
+                return Object.assign({}, state, {
+                    isNetworkOnline: action.value
+                });
+
+            default:
+                return state;
+        }
+    };
+
+    App.reducers.appInfo = appInfoReducer;
+
+})();
+</script>

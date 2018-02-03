@@ -1,0 +1,12 @@
+{
+    "rules": {
+      "members": {
+        ".read": true,
+        ".write": false
+      },
+      "notes": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    }
+}

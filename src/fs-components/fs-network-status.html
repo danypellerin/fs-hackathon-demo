@@ -1,0 +1,64 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-network-status">
+  <template>
+
+
+  </template>
+
+  <script>
+    (function () {
+
+      /**
+       * Class to be used as a Template for new elements
+       * @polymer
+       */
+      class FSNetworkStatus extends Polymer.mixinBehaviors(Polymer.AppNetworkStatusBehavior, ReduxMixin(Polymer.Element)) { // Custom element definition
+
+        /**
+         * Defines the name of the element: <fs-network-status></fs-network-status>.
+         * @return {string} name that the element will use.
+         */
+        static get is() { return 'fs-network-status'; }
+
+        static get actions() {
+          return {
+            updateNetwork(isNetworkOnline) {
+              return {
+                type: 'UPDATE_NETWORK_STATUS',
+                value: isNetworkOnline
+              }
+            }
+          }
+        }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-network-status
+                      prop1="something" >
+                   </fs-network-status>
+         */
+        static get properties() {
+          return {
+            isOnline: {
+              type: Boolean,
+              computed: 'computeNetworkStatus(online)'
+            }
+          };
+        }
+
+        computeNetworkStatus(status) {
+
+          // Update message using the Action Creator
+          this.dispatch('updateNetwork', status);
+        }
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSNetworkStatus.is, FSNetworkStatus);
+
+    })();
+  </script>
+
+</dom-module>
