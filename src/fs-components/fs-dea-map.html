@@ -14,7 +14,7 @@
       }
     </style>
 
-    <google-map fit-to-markers api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+    <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" fit-to-markers api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
       <template is="dom-repeat" items="[[filteredDeas]]">
         <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"></google-map-marker>
       </template>
@@ -201,6 +201,18 @@
                   }
                 }
               ]
+            },
+            position: {
+              type: Object,
+              value: {
+                "longitude": -72.6556862,
+                "latitude": 46.625204
+              }
+            },
+            test: {
+              type: Array,
+              value: [],
+              statePath: "deaLocations"
             }
           };
         }
