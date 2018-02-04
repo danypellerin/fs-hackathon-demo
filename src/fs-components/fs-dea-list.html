@@ -2,7 +2,7 @@
 <link rel="import" href="../redux-mixin.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
@@ -59,6 +59,7 @@
             }
 
             .shortInfo,
+            .endshortInfo,
             .detailInfo {
                 font-size: 14px;
             }
@@ -68,17 +69,21 @@
                 display: none;
             }
 
-            .item:hover .shortInfo::after {
+            .item:hover .endshortInfo::after {
                 content: ' [+]';
                 color: gray;
             }
 
-            .item.expanded:hover .shortInfo::after {
+            .item.expanded:hover .endshortInfo::after {
                 content: '';
             }
 
             .item.expanded .detailInfo {
                 display: block;
+            }
+
+            .item.expanded .endshortInfo {
+                display: none;
             }
 
             .item.expanded:hover .detailInfo::after {
@@ -104,13 +109,19 @@
                 <div>
                     <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
                         <div class="pad">
-                            <div class="primary">Adress: [[dea.adresse]]</div>
-                            <span class="shortInfo">Open</span>
-                            <span class="detailInfo">batiment: [[dea.batiment]]</span>
-                            <span class="detailInfo">modele: [[dea.modele]]</span>
-                            <span class="detailInfo">source: [[dea.source]]</span>
+                            <span class="primary">[[dea.batiment]]</span>
+                            <span class="shortInfo">Adress: [[dea.adresse]]</span>
+                            <span class="endshortInfo">Open</span>
+                            <span class="detailInfo">Ouverture: [[dea.heures.debut]] - [[dea.heures.fin]]</span>
+                            <span class="detailInfo">[[dea.modele]]</span>
+                            <span class="detailInfo">[[dea.source]]</span>
                         </div>
-                        <iron-icon src="../../images/phone.png"></iron-icon>
+                        <template is="dom-if" if="[[dea.telephoneResponsable]]">
+                            <a href="tel:[[dea.telephoneResponsable]]">
+                                <iron-icon src="../../images/phone.png"></iron-icon>
+                            </a>
+                        </template>
+
                     </div>
                 </div>
             </template>
@@ -191,6 +202,18 @@
                     return selected ? 'item expanded' : 'item';
                 }
 
+                checkIfOpen(time) {
+                    var timeNow = new Date();
+                    var closeTime = new Date();
+                    var timeDetails = time.split(":");
+                    closeTime.setHours(timeDetails[0], timeDetails[1], 0);
+                    if (timNow < closeTime){
+                        return 'open';
+                    }
+                    else{
+                        return 'close';
+                    }
+                }
 
 
 
