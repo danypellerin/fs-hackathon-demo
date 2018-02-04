@@ -15,14 +15,15 @@
         <style>
             :host {
                 display: block;
+
             }
 
 
             iron-list {
                 padding-top: 64px;
                 --iron-list-items-container: {
-                    max-width: 800px;
                     margin: auto;
+                    max-height: 100%;
                     margin-top: 60px;
                     margin-bottom: 60px;
                     border-bottom: 1px solid #ddd;
@@ -32,36 +33,30 @@
 
             .item {
                 @apply --layout-horizontal;
-                padding: 20px;
+                padding: 1.5em;
                 background-color: white;
                 border: 1px solid #ddd;
                 cursor: pointer;
                 margin-bottom: 10px;
             }
 
-            .avatar {
-                height: 40px;
-                width: 40px;
-                border-radius: 20px;
-                box-sizing: border-box;
-                background-color: #DDD;
-            }
+
 
             .pad {
-                padding: 0 16px;
+                padding: 0 1em;
                 @apply --layout-flex;
                 @apply --layout-vertical;
             }
 
             .primary {
-                font-size: 16px;
+                font-size: 1em;
                 font-weight: bold;
             }
 
             .shortInfo,
             .endshortInfo,
             .detailInfo {
-                font-size: 14px;
+                font-size: 0.75em;
             }
 
             .detailInfo {
@@ -104,17 +99,19 @@
 
 
         <!-- HTML template here -->
-        <iron-list items="[[deaList]]" as="dea" selection-enabled multi-selection>
+        <iron-list items="[[deaDetailedList]]" as="dea" selection-enabled multi-selection>
             <template>
                 <div>
                     <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
                         <div class="pad">
                             <span class="primary">[[dea.batiment]]</span>
-                            <span class="shortInfo">Adress: [[dea.adresse]]</span>
-                            <span class="endshortInfo">Open</span>
+                            <span class="detailInfo">Adress: [[dea.adresse]]</span>
+                            <span class="endshortInfo">[[dea.disponibility]]</span>
                             <span class="detailInfo">Ouverture: [[dea.heures.debut]] - [[dea.heures.fin]]</span>
                             <span class="detailInfo">[[dea.modele]]</span>
                             <span class="detailInfo">[[dea.source]]</span>
+                            <span class="shortInfo">distance: [[dea.distanceWalking]]</span>
+                            <span class="shortInfo">distance: [[dea.distanceDriving]]</span>
                         </div>
                         <template is="dom-if" if="[[dea.telephoneResponsable]]">
                             <a href="tel:[[dea.telephoneResponsable]]">
@@ -134,8 +131,8 @@
         (function () { // IIFE
 
             const userLocation = {
-                latidude: -72.6822718,
-                longitude: 46.6204874
+                longitude: -72.6822718,
+                latitude: 46.6204874
             };
             /**
              * Class to be used as a Template for new elements
@@ -170,12 +167,16 @@
                             type: Array,
                             value: [],
                             statePath: "deaLocations",
-                            oberver: "distance"
+                            observer: "deaInfoChanged"
                         },
                         userLocation: {
-                            type: String,
+                            type: Object,
                             value: userLocation,
-                            observer: "userLocationChange"
+                            observer: "deaInfoChanged"
+                        },
+                        deaDetailedList: {
+                            type: Array,
+                            value: []
                         }
                     };
                 }
@@ -187,36 +188,65 @@
                   */
                 _doSomething(param) { }
 
-                distance(newvalue) {
-                    this.deaList.forEach()
-                }
+                deaInfoChanged(newValue, oldValue) {
 
-                userLocationChange(newValue, oldValue) {
-                    this.deaList.forEach((statePath) => {
+                    let deaList = this.deaList;
+                    let userLocation = this.userLocation;
+                    let deaDetailedList = [];
+                    let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.latitude + "," + userLocation.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
+                    let distanceURLWalking = distanceURL + "&mode=Walking&destinations=";
+                    let distanceURLDriving = distanceURL + "&mode=Driving&destinations=";
 
+                    this.deaList.forEach((dea) => {
+                        //Building both URL to get the destinations
+                        distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
+                        distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
 
                     })
+
+                    //Get JSON files with the list of destination information
+                    /*fetch(distanceURLWalking)
+                        .then(response => {
+                            console.log(response);
+                        });
+
+                    fetch(distanceURLDriving)
+                        .then(response => {
+                            console.log(response);
+                        });*/
+
+                    this.deaList.forEach((dea) => {
+                        //Add all items on the page
+                        dea.distanceWalking = "1"
+                        dea.distanceDriving = "2"
+
+                        var time = dea.heures;
+                        if (time == null) { }
+                        else {
+                            var timeDetails = time.fin.split(":");
+                            var timeNow = new Date();
+                            var closeTime = new Date();
+
+                            closeTime.setHours(timeDetails[0], timeDetails[1], 0);
+                            if (timeNow < closeTime) {
+                                dea.disponibility = "Open";
+                            }
+                            else {
+                                dea.disponibility = 'Closed';
+                            }
+                        }
+
+
+                        deaDetailedList.push(dea);
+
+                        // deaDetailedList.push()
+                    })
+                    this.deaDetailedList = deaDetailedList;
                 }
 
                 getClassForItem(item, selected) {
                     return selected ? 'item expanded' : 'item';
                 }
-
-                checkIfOpen(time) {
-                    var timeNow = new Date();
-                    var closeTime = new Date();
-                    var timeDetails = time.split(":");
-                    closeTime.setHours(timeDetails[0], timeDetails[1], 0);
-                    if (timNow < closeTime){
-                        return 'open';
-                    }
-                    else{
-                        return 'close';
-                    }
-                }
-
-
-
             }
 
             // Registers the element in the browser
