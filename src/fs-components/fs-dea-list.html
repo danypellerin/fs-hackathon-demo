@@ -167,10 +167,10 @@
                  */
                 static get properties() {
                     return {
-                        deaList: {
+                        resourceList: {
                             type: Array,
                             value: [],
-                            statePath: "deaLocations",
+                            statePath: "resource",
                             observer: "deaInfoChanged"
                         },
                         userLocation: {
@@ -194,7 +194,7 @@
 
                 deaInfoChanged(newValue, oldValue) {
 
-                    let deaList = this.deaList;
+                    let resourceList = this.resourceList;
                     let userLocation = this.userLocation;
                     let deaDetailedList = [];
                     let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.location.latitude + "," + userLocation.location.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
@@ -231,7 +231,7 @@
 
                     /*directionsService.UnitSystem = UnitSystem.METRIC*/
 
-                    this.deaList.forEach((dea) => {
+                    this.resourceList.forEach((dea) => {
                         //Building both URL to get the destinations
                         distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
                         distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
@@ -255,7 +255,7 @@
                     fetch(distanceURLDriving).then(response => response.json().then(json => {jsonDriving = json}));
                     */
 
-                    this.deaList.forEach((dea) => {
+                    this.resourceList.forEach((dea) => {
                         //Add all items on the page
                         dea.distanceWalking = "1"
                         dea.timeWalking = "1.1"

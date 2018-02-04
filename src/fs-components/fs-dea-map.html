@@ -61,7 +61,7 @@
             filteredDeas: {
               type: Array,
               value: [],
-              statePath: "deaLocations"
+              statePath: "resource"
             },
             position: {
               type: Object,
@@ -97,6 +97,13 @@
                   ]
                 }
               ]
+            },
+            filter: (item) => {
+                if (item.type === "DEA"){
+                  return true;
+                }
+                
+                return false;
             }
           };
         }
