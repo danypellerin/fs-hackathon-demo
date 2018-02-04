@@ -12,25 +12,34 @@
       google-map {
         height: 93vh;
       }
+      .popup-detail{
+        top : top - 10px
+      }
     </style>
 
-    <google-map id="googleMap" latitude="[[calculatedPosition.latitude]]" longitude="[[calculatedPosition.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
-      <google-map-marker latitude="[[userPosition.latitude]]" longitude="[[userPosition.longitude]]" draggable="false" icon="../../images/position.png"> </google-map-marker>
+    <google-map id="googleMap" latitude="[[calculatedPosition.latitude]]" longitude="[[calculatedPosition.longitude]]" zoom="[[defaultZoomLevel]]"
+      styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+      <google-map-marker latitude="[[userPosition.latitude]]" longitude="[[userPosition.longitude]]" draggable="false" icon="../../images/position.png">
+      </google-map-marker>
       <!-- DEA -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterDea]]">
-        <google-map-marker id="marker-[[index]]" latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" click-events="true" on-google-map-marker-click="Clicked" icon="../../images/aed.png"> </google-map-marker>
+        <google-map-marker id="marker-[[index]]" latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]"
+          draggable="false" click-events="true" on-google-map-marker-click="clicked" icon="../../images/aed.png"> </google-map-marker>
       </template>
       <!-- Fire station -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterFireStation]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" icon="../../images/fire-station.png"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/fire-station.png"></google-map-marker>
       </template>
       <!-- Police -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPolice]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" icon="../../images/police.png"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/police.png"></google-map-marker>
       </template>
       <!-- Pharmacy -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPharmacy]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" icon="../../images/pharmacy.png"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/pharmacy.png"></google-map-marker>
       </template>
     </google-map>
   </template>
@@ -38,7 +47,7 @@
   <script>
     (function () {
       const DEFAULT_ZOOM_LEVEL = 17;
-
+      let infoWindow = [];
       /**
        * Shows the DEA on a map
        * @polymer
@@ -56,6 +65,37 @@
          */
         constructor() {
           super();
+        }
+
+        setInfoWindows() {
+          infoWindow = [];
+          for (let index = 0; index < this.filteredDeas.length; index++) {
+            let element = this.filteredDeas[index];
+            let batiment = "";
+            let adresse = "";
+            let telephoneResponsable = "";
+            if(element.batiment !== undefined){
+                batiment = element.batiment;
+            }
+            if(element.adresse !== undefined){
+              adresse = element.adresse;
+            }
+            if(element.telephoneResponsable !== undefined){
+              telephoneResponsable = element.telephoneResponsable;
+            }
+
+            infoWindow.push(new google.maps.InfoWindow(
+              {
+                
+                content: "<span class=popup-detail>" +batiment + "<br>" + adresse + "<br>" + telephoneResponsable +"</span>",
+                position: {
+                  lat: element.localisation.latitude,
+                  lng: element.localisation.longitude
+                }
+              }
+            )
+            );
+          }
         }
 
         filterDea(item) {
@@ -91,7 +131,7 @@
         }
 
         targetPositionChanged(position) {
-          if (!this.googleApiLoaded){
+          if (!this.googleApiLoaded) {
             return;
           }
 
@@ -124,7 +164,8 @@
             filteredDeas: {
               type: Array,
               value: [],
-              statePath: "resource"
+              statePath: "resource",
+              observer: "setInfoWindows"
             },
             position: {
               type: Object,
@@ -180,18 +221,14 @@
           };
         }
 
-        Clicked(e, detail, sender){     
-          let infowindow = new google.maps.InfoWindow({
-            content: "",
-            position: {
-                        lat:detail.latLng.lat(),
-                        lng:detail.latLng.lng()
-                       }
-          });
-          infowindow.open(this.$.googleMap,e.target);
+        clicked(e, detail, sender) {
+          let id = parseInt(e.target.id.replace('marker-',''));
+          
+         if(!infoWindow[id].view){
+          infoWindow[id].open(this.$.googleMap, e.target);
+         }          
         }
       }
-
       // Registers the element in the browser
       customElements.define(FsDeaMap.is, FsDeaMap);
 
