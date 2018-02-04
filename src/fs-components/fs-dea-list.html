@@ -183,25 +183,31 @@
                                 this.deaList[j].distanceWalking = element.distance.text;
 
                                 //Create a TimeStamp value for the order by later
-                                minuteIndex = element.duration.text.search("minute");
-                                if (minuteIndex > -1){
-                                    minute = element.duration.text.substring(minuteIndex-3,minuteIndex-1);
-                                }
+                                minuteIndex = element.duration.text.search("minute");
+                                if (minuteIndex > -1) {
+                                    minute = element.duration.text.substring(minuteIndex - 3, minuteIndex - 1);
+                                }
+                                
+                                hourIndex = element.duration.text.search("heure");
+                                if (hourIndex == -1) {
+                                    hourIndex = element.duration.text.search("hour");
+                                }
 
-                                hourIndex = element.duration.text.search("heure");
-                                if (hourIndex > -1){
-                                    hour = element.duration.text.substring(hourIndex-3,hourIndex-1);
-                                }
+                                if (hourIndex > -1) {
+                                    hour = element.duration.text.substring(hourIndex - 3, hourIndex - 1);
+                                }
 
-                                dayIndex = element.duration.text.search("day");
-                                if (dayIndex > -1){
-                                    day = element.duration.text.substring(dayIndex-3,dayIndex-1);
-                                }
+                                dayIndex = element.duration.text.search("jour");
+                                if (dayIndex == -1) {
+                                    dayIndex = element.duration.text.search("day");
+                                }
 
-                                this.deaList[j].timestampWalking = parseFloat(day*24*60) + parseFloat(hour*60) + parseFloat(minute)
+                                if (dayIndex > -1) {
+                                    day = element.duration.text.substring(dayIndex - 3, dayIndex - 1);
+                                }
 
                                 //If the duration is more than 1 hour, we show only ">1h"
-                                if (element.duration.text.search("heure") > -1){
+                                if (element.duration.text.search("heure") > -1 || element.duration.text.search("hour") > -1) {
                                     this.deaList[j].timeWalking = ">1h";
                                 }
                                 else{
@@ -218,41 +224,44 @@
                             let timeBeforeClose;
 
                             if (time != null) {
-                                dea.ouverture = 'Ouverture: ' + dea.heures.debut + ' - ' + dea.heures.fin;
-                                let timeCloseDetails = time.fin.split(":");
-                                let timeOpenDetails = time.debut.split(":");
-                                let timeNow = new Date();
-                                let openTime = new Date();
-                                let closeTime = new Date();
+                                dea.ouverture = dea.heures.debut + ' - ' + dea.heures.fin;
+                                let timeCloseDetails = time.fin.split(":");
+                                let timeOpenDetails = time.debut.split(":");
+                                let timeNow = new Date();
+                                let openTime = new Date();
+                                let closeTime = new Date();
 
-                                //Add the walking time to now
-                                timeNow.setMinutes(timeNow.getMinutes() + dea.timestampWalking);
+                                //Set Close and Open time
+                                closeTime.setHours(timeCloseDetails[0], timeCloseDetails[1], 0);
+                                openTime.setHours(timeOpenDetails[0], timeOpenDetails[1], 0);
 
-                                //Set Close and Open time
-                                closeTime.setHours(timeCloseDetails[0], timeCloseDetails[1], 0);
-                                openTime.setHours(timeOpenDetails[0], timeOpenDetails[1], 0);
+                                //Calculate how many minutes we have before it opened or closed
+                                timeBeforeClose = (timeNow - closeTime) / 1000 / 60
 
-                                //Calculate how many minutes we have before it open or clos
-                                timeBeforeOpen = (timeNow - openTime) / 1000 / 60
-                                timeBeforeClose = (timeNow - closeTime) / 1000 / 60
+                                if (timeBeforeOpen > 0 && timeBeforeClose < -15) {
+                                    dea.disponibility = "open";
+                                    dea.isOpen = 1;
 
+                                    //Calculate if we have enough time to reach the destination by walking
+                                    timeNow = timeNow.setMinutes(timeNow.getMinutes() + dea.timestampWalking);
+                                    timeBeforeOpenWalking = (timeNow - openTime) / 1000 / 60
+                                    timeBeforeCloseWalking = (timeNow - closeTime) / 1000 / 60
+                                
 
-                                if (timeBeforeOpen > 0 && timeBeforeClose < -15) {
-                                    dea.disponibility = "Open";
-                                    dea.isOpen = 1;
-                                } else if (timeBeforeOpen > 0 && timeBeforeClose > -15 && timeBeforeClose <= 0){
-                                    dea.disponibility = "Hurry";
-                                    dea.isOpen = 1;
-                                }
-                                else{
-                                    dea.disponibility = "Closed";
-                                    dea.isOpen = 0;
-                                }
-                            }
-                            else{
-                                dea.disponibility = "Open";
-                                dea.isOpen = 1;
-                            }
+                                    if (timeBeforeOpenWalking > 0 && timeBeforeCloseWalking > -15 && timeBeforeCloseWalking <= 0) {
+                                        dea.disponibility = "hurry";
+                                    }
+                                }
+                                else {
+                                    dea.disponibility = "closed";
+                                    dea.isOpen = 0;
+                                }
+                            }
+                            else {
+                                dea.disponibility = "open";
+                                dea.isOpen = 1;
+                            }
+
                             result.push(dea);
                         });
 
