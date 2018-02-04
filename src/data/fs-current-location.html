@@ -7,7 +7,10 @@
     </template>
 
     <script>
+
         (function () {
+
+            let userLocationSet = false;
 
             /**
              * Class to be used as a Template for new elements
@@ -45,6 +48,15 @@
                         type: 'UPDATE_USER_LOCATION',
                         value: position.coords
                     });
+
+                    if(!userLocationSet) {
+                        userLocationSet = true;
+
+                        this.dispatch({
+                            type: 'SELECTED_POSITION_CHANGED',
+                            value: position.coords
+                        });
+                    }
                 }
 
                 error(err) {

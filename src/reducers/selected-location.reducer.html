@@ -1,0 +1,24 @@
+<script>
+    (function () {
+
+        const selectedLocation = {
+            latitude: 46,
+            longitude: -72
+        };
+
+        const selectedLocationReducer = (state = selectedLocation, action) => {
+
+            switch (action.type) {
+
+                case 'SELECTED_POSITION_CHANGED':
+                    return Object.assign({}, action.value);
+
+                default:
+                    return state;
+            }
+        };
+
+        App.reducers.selectedLocation = selectedLocationReducer;
+
+    })();
+</script>
