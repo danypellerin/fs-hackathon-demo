@@ -14,10 +14,10 @@
       }
     </style>
 
-    <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+    <google-map id="googleMap" latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[resourceFilter]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
-          icon="../../images/aed.png"></google-map-marker>
+        <google-map-marker id="marker-[[index]]" latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" click-events="true" on-google-map-marker-click="Clicked"
+          icon="../../images/aed.png">  </google-map-marker>
       </template>
     </google-map>
   </template>
@@ -114,6 +114,17 @@
                 return false;
             }
           };
+        }
+
+        Clicked(e, detail, sender){     
+          let infowindow = new google.maps.InfoWindow({
+            content: "Moda",
+            position: {
+                        lat:detail.latLng.lat(),
+                        lng:detail.latLng.lng()
+                       }
+          });
+          infowindow.open(this.$.googleMap,e.target);
         }
       }
 
