@@ -5,7 +5,6 @@
 <link rel="import" href="reducers/resource.reducer.html">
 <link rel="import" href="reducers/data-loaded.reducer.html">
 <link rel="import" href="reducers/user-location.reducer.html">
-<link rel="import" href="reducers/localization.reducer.html">
 <link rel="import" href="reducers/selected-location.reducer.html">
 
 <script>
@@ -27,7 +26,10 @@
                 isNetworkOnline: false
             },
             members: [],
-            uiState: {},
+            uiState: {
+                mapsLoaded,
+                currentLanguage
+            },
             resource: [],
             selectedLocation: {
                 latitude: 46,

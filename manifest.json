@@ -1,7 +1,7 @@
 {
-  "name": "Fs App",
-  "short_name": "Fs App",
-  "description": "Fs hackathon app",
+  "name": "I-Vie",
+  "short_name": "I-Vie",
+  "description": "Shawinigan hackathon app developed by Factorians.",
   "icons": [
     {
       "src": "images/manifest/icon-192x192.png",

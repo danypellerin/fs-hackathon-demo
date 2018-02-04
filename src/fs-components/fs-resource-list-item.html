@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
 <link rel="import" href="../redux-mixin.html">
 
 <dom-module id="fs-resource-list-item">
@@ -116,7 +117,7 @@
           </template>
 
           <div class="detailed-info">
-            <span>Adress: [[resource.adresse]]</span>
+            <span>{{localize('address')}} [[resource.adresse]]</span>
             <span>[[resource.modele]]</span>
             <span>[[resource.source]]</span>
             <span>[[resource.ouverture]]</span>
@@ -142,7 +143,7 @@
        * Class to be used as a Template for new elements
        * @polymer
        */
-      class FSResourceListItem extends ReduxMixin(Polymer.Element) {
+      class FSResourceListItem extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior], ReduxMixin(Polymer.Element)) {
 
         /**
          * Defines the name of the element: <fs-resource-list-item></fs-resource-list-item>.
@@ -183,7 +184,6 @@
 
         setSelectedLocation() {
           const location = this.resource.localisation;
-
           this.dispatch({
               type: 'SELECTED_POSITION_CHANGED',
               value: location
