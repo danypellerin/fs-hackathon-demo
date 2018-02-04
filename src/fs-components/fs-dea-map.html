@@ -14,23 +14,22 @@
       }
     </style>
 
-    <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+    <google-map fit-to-markers api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
       <template is="dom-repeat" items="[[filteredDeas]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
-          icon="../../images/aed.png"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"></google-map-marker>
       </template>
     </google-map>
   </template>
 
   <script>
     (function () {
-      const DEFAULT_ZOOM_LEVEL = 17;
 
       /**
        * Shows the DEA on a map
        * @polymer
        */
       class FsDeaMap extends ReduxMixin(Polymer.Element) {
+
         /**
          * Defines the name of the element
          * @return {string} Element name
@@ -53,48 +52,153 @@
          */
         static get properties() {
           return {
-            defaultZoomLevel: {
-              type: Number,
-              readOnly: true,
-              value: DEFAULT_ZOOM_LEVEL
-            },
             filteredDeas: {
-              type: Array,
-              value: [],
-              statePath: "deaLocations"
-            },
-            position: {
-              type: Object,
-              value: [],
-              statePath: "userLocation.location"
-            },
-            mapStyle: {
               type: Array,
               value: [
                 {
-                  featureType: "administrative",
-                  elementType: "labels",
-                  stylers: [
-                    { visibility: "off" }
-                  ]
+                  "batiment": "Maison Francis Brisson",
+                  "adresse": "15, Avenue de Grand-Mère",
+                  "modele": "LifePack Plus",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.6822718,
+                    "latitude": 46.6204874
+                  }
                 }, {
-                  featureType: "poi",
-                  elementType: "labels",
-                  stylers: [
-                    { visibility: "off" }
-                  ]
+                  "batiment": "Centre des Arts",
+                  "adresse": "2100, Boul. des Hêtres",
+                  "modele": "LifePack Plus",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.7483524,
+                    "latitude": 46.5589794
+                  }
                 }, {
-                  featureType: "water",
-                  elementType: "labels",
-                  stylers: [
-                    { visibility: "off" }
-                  ]
+                  "batiment": "Centre communautaire",
+                  "adresse": "1594, chemin de St-Jean-des-Piles",
+                  "modele": "LifePack Plus",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.7410582,
+                    "latitude": 46.691801
+                  }
                 }, {
-                  featureType: "road",
-                  elementType: "labels",
-                  stylers: [
-                    { visibility: "off" }
-                  ]
+                  "batiment": "Centre multiservices",
+                  "adresse": "1375, chemin Principal (St-Gérard)",
+                  "modele": null,
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.8138393,
+                    "latitude": 46.6024698
+                  }
+                }, {
+                  "batiment": "Centre communautaire",
+                  "adresse": "431, chemin des Frênes (St-Gérard)",
+                  "modele": "LifePack Express",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.8127363,
+                    "latitude": 46.60095
+                  }
+                }, {
+                  "batiment": "Maison du citoyen",
+                  "adresse": "505, 205e Avenue (St-Georges)",
+                  "modele": "LifePack Plus",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.6588215,
+                    "latitude": 46.6255698
+                  }
+                }, {
+                  "batiment": "Station plein air Val-Mauricie",
+                  "adresse": "1700, rue de Val-Mauricie (Shawi-Sud)",
+                  "modele": "Zoll AED 3",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.7603358,
+                    "latitude": 46.5221049
+                  }
+                }, {
+                  "batiment": "Salle communautaire Lupien",
+                  "adresse": "1071, ch. de la Vigilance (Lac-à-la-Tortue)",
+                  "modele": "LifePack Plus",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.6328242,
+                    "latitude": 46.612654
+                  }
+                }, {
+                  "batiment": "Centre communautaire C-Langevin",
+                  "adresse": "4161, chemin de Ste-Flore (Grand-Mère)",
+                  "modele": "LifePack Plus",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.7420832,
+                    "latitude": 46.610576
+                  }
+                }, {
+                  "batiment": "Centre communautaire Shawinigan",
+                  "adresse": "253, 3e rue de la Pointe (Shawinigan)",
+                  "modele": "LifePack Plus",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.7460692,
+                    "latitude": 46.53913
+                  }
+                }, {
+                  "batiment": "Hôtel de ville - Salle du conseil",
+                  "adresse": "550, avenue de l'hôtel-de-Ville",
+                  "modele": "Zoll AED 3",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.7459492,
+                    "latitude": 46.541105
+                  }
+                }, {
+                  "batiment": "Amphithéâtre (Entrée)",
+                  "adresse": "1, rue Jacques-Plante",
+                  "modele": "Zoll AED 3",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.745599,
+                    "latitude": 46.5471887
+                  }
+                }, {
+                  "batiment": "Amphithéâtre (Chambre)",
+                  "adresse": "1, rue Jacques-Plante",
+                  "modele": "Zoll AED 3",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.745599,
+                    "latitude": 46.5471887
+                  }
+                }, {
+                  "batiment": "Aréna Grand-Mère",
+                  "adresse": "601, 3e Avenue",
+                  "modele": "Zoll AED 3",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.6903362,
+                    "latitude": 46.612322
+                  }
+                }, {
+                  "batiment": "Aréna Gilles-Bourassa",
+                  "adresse": "1609, 117e Rue",
+                  "modele": "Zoll AED 3",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.7560032,
+                    "latitude": 46.516978
+                  }
+                }, {
+                  "batiment": "Aréna Émile-Bédard",
+                  "adresse": "540, 207e Avenue",
+                  "modele": "Zoll AED 3",
+                  "source": "Ville de Shawinigan",
+                  "localisation": {
+                    "longitude": -72.6556862,
+                    "latitude": 46.625204
+                  }
                 }
               ]
             }

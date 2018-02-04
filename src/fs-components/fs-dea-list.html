@@ -2,7 +2,7 @@
 <link rel="import" href="../redux-mixin.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
@@ -15,16 +15,15 @@
         <style>
             :host {
                 display: block;
+
             }
 
 
             iron-list {
                 padding-top: 64px;
                 --iron-list-items-container: {
-                    max-width: 800px;
                     margin: auto;
-                    margin-top: 60px;
-                    margin-bottom: 60px;
+                    max-height: 100%;
                     border-bottom: 1px solid #ddd;
                 }
                 ;
@@ -32,35 +31,30 @@
 
             .item {
                 @apply --layout-horizontal;
-                padding: 20px;
+                padding: 1.5em;
                 background-color: white;
                 border: 1px solid #ddd;
                 cursor: pointer;
                 margin-bottom: 10px;
             }
 
-            .avatar {
-                height: 40px;
-                width: 40px;
-                border-radius: 20px;
-                box-sizing: border-box;
-                background-color: #DDD;
-            }
+
 
             .pad {
-                padding: 0 16px;
+                padding: 0 1em;
                 @apply --layout-flex;
                 @apply --layout-vertical;
             }
 
             .primary {
-                font-size: 16px;
+                font-size: 1em;
                 font-weight: bold;
             }
 
             .shortInfo,
+            .endshortInfo,
             .detailInfo {
-                font-size: 14px;
+                font-size: 0.75em;
             }
 
             .detailInfo {
@@ -68,17 +62,21 @@
                 display: none;
             }
 
-            .item:hover .shortInfo::after {
+            .item:hover .endshortInfo::after {
                 content: ' [+]';
                 color: gray;
             }
 
-            .item.expanded:hover .shortInfo::after {
+            .item.expanded:hover .endshortInfo::after {
                 content: '';
             }
 
             .item.expanded .detailInfo {
                 display: block;
+            }
+
+            .item.expanded .endshortInfo {
+                display: none;
             }
 
             .item.expanded:hover .detailInfo::after {
@@ -99,18 +97,32 @@
 
 
         <!-- HTML template here -->
-        <iron-list items="[[deaList]]" as="dea" selection-enabled multi-selection>
+        <iron-list items="[[deaDetailedList]]" as="dea" selection-enabled multi-selection>
             <template>
                 <div>
                     <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
                         <div class="pad">
-                            <div class="primary">Adress: [[dea.adresse]]</div>
-                            <span class="shortInfo">Open</span>
-                            <span class="detailInfo">batiment: [[dea.batiment]]</span>
-                            <span class="detailInfo">modele: [[dea.modele]]</span>
-                            <span class="detailInfo">source: [[dea.source]]</span>
+                            <span class="primary">[[dea.batiment]]</span>
+                            <span class="shortInfo">distance: [[dea.distanceWalking]]</span>  
+                        	<span class="shortInfo">time walking: [[dea.timeWalking]]</span>
+                            <template is="dom-if" if=[[dea.heures]]>
+                                <span class="shortInfo">distance: [[dea.distanceDriving]]</span>
+                                <span class="endshortInfo">[[dea.disponibility]]</span>
+                            </template>
+                            <template is="dom-if" if=[[!dea.heures]]>
+                                    <span class="endshortInfo">distance: [[dea.distanceDriving]]</span>
+                                </template>
+                            <span class="detailInfo">Adress: [[dea.adresse]]</span>
+                            <span class="detailInfo">[[dea.modele]]</span>
+                            <span class="detailInfo">[[dea.source]]</span>
+                            <span class="detailInfo">[[dea.ouverture]]</span>
+
                         </div>
-                        <iron-icon src="../../images/phone.png"></iron-icon>
+                        <template is="dom-if" if=[[dea.telephoneResponsable]]>
+                            <a href="tel:[[dea.telephoneResponsable]]">
+                                <iron-icon src="../../images/phone.png"></iron-icon>
+                            </a>
+                        </template>
                     </div>
                 </div>
             </template>
@@ -122,10 +134,10 @@
     <script>
         (function () { // IIFE
 
-            const userLocation = {
-                latidude: -72.6822718,
-                longitude: 46.6204874
-            };
+            /*const userLocation = {
+                longitude: -72.6822718,
+                latitude: 46.6204874
+            };*/
             /**
              * Class to be used as a Template for new elements
              * @polymer
@@ -159,12 +171,16 @@
                             type: Array,
                             value: [],
                             statePath: "deaLocations",
-                            oberver: "distance"
+                            observer: "deaInfoChanged"
                         },
                         userLocation: {
-                            type: String,
-                            value: userLocation,
-                            observer: "userLocationChange"
+                            type: Object,
+                            statePath: "userLocation",
+                            observer: "deaInfoChanged"
+                        },
+                        deaDetailedList: {
+                            type: Array,
+                            value: []
                         }
                     };
                 }
@@ -176,24 +192,107 @@
                   */
                 _doSomething(param) { }
 
-                distance(newvalue) {
-                    this.deaList.forEach()
-                }
+                deaInfoChanged(newValue, oldValue) {
 
-                userLocationChange(newValue, oldValue) {
-                    this.deaList.forEach((statePath) => {
+                    let deaList = this.deaList;
+                    let userLocation = this.userLocation;
+                    let deaDetailedList = [];
+                    let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.location.latitude + "," + userLocation.location.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
+                    let distanceURLWalking = distanceURL + "&mode=Walking&destinations=";
+                    let distanceURLDriving = distanceURL + "&mode=Driving&destinations=";
+                    let travelModeWalking = "Walking"
+                    let travelModeDriving = "Driving"
 
+                    let Index = 0;
+                    let jsonWalking;
+                    let jsonDriving;
+                    
+
+                    let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location.longitude);
+                    let directionsService = new google.maps.DirectionsService;
+                    let directionsDisplay = new google.maps.DirectionsRenderer;
+
+                    directionsService.route = 
+                    (
+                        {
+                            origin: originPoint,
+                            destination: originPoint,
+                            travelMode: 'DRIVING'
+                        },
+                        function(response, status) 
+                        {
+                            if (status === 'OK') {
+                                directionsDisplay.setDirections(response);
+                            } else {
+                                window.alert('Directions request failed due to ' + status);
+                            }
+                        }
+                    );
+
+                    /*directionsService.UnitSystem = UnitSystem.METRIC*/
+
+                    this.deaList.forEach((dea) => {
+                        //Building both URL to get the destinations
+                        distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
+                        distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
+                        dea.Id = Index++;
 
                     })
+
+                    //Get JSON files with the list of destination information
+                   /* fetch(distanceURLWalking)
+                        .then(response => {
+                            console.log(response);
+                        });*/
+
+                    // fetch(distanceURLDriving)
+                    //     .then(response => {
+                    //         console.log(response);
+                    //     });
+
+                    /*
+                    fetch(distanceURLWalking).then(response => response.json().then(json => {jsonWalking = json}));
+                    fetch(distanceURLDriving).then(response => response.json().then(json => {jsonDriving = json}));
+                    */
+
+                    this.deaList.forEach((dea) => {
+                        //Add all items on the page
+                        dea.distanceWalking = "1"
+                        dea.timeWalking = "1.1"
+                        dea.distanceDriving = "2"
+                        dea.timeDriving = "2.2"
+                        //dea.distanceWalking = jsonWalking.element[dea.Id].distance.text
+                        //dea.distanceDriving = jsonDriving.element[dea.Id].distance.text
+                        //dea.timeWalking = jsonWalking.element[dea.Id].duration.text
+                        //dea.timeDriving = jsonDriving.element[dea.Id].duration.text
+
+                        var time = dea.heures;
+                        if (time == null) {
+                        }
+                        else {
+                            dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
+                            var timeDetails = time.fin.split(":");
+                            var timeNow = new Date();
+                            var closeTime = new Date();
+
+                            closeTime.setHours(timeDetails[0], timeDetails[1], 0);
+                            if (timeNow < closeTime) {
+                                dea.disponibility = "Open";
+                            }
+                            else {
+                                dea.disponibility = 'Closed';
+                            }
+                        }
+
+
+                        deaDetailedList.push(dea);
+                    })
+                    this.deaDetailedList = deaDetailedList;
                 }
 
                 getClassForItem(item, selected) {
                     return selected ? 'item expanded' : 'item';
                 }
-
-
-
-
             }
 
             // Registers the element in the browser
