@@ -89,8 +89,12 @@
                     return {
                         deaList: {
                             type: Array,
+                            value: []
+                        },
+                        resourceList: {
+                            type: Array,
                             value: [],
-                            statePath: "deaLocations",
+                            statePath: "resource",
                             observer: "deaInfoChanged"
                         },
                         userLocation: {
@@ -114,12 +118,16 @@
 
                 deaInfoChanged(newValue, oldValue) {
 
-                    let deaList = this.deaList;
+                    this.deaList = [];
+                    
+                    this.resourceList.forEach((resource => {
+                        if (resource.type === "DEA"){
+                            this.deaList.push(resource);
+                        }
+                    }));
+
                     let userLocation = this.userLocation;
                     let deaDetailedList = [];
-                    // let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.location.latitude + "," + userLocation.location.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
-                    // let distanceURLWalking = distanceURL + "&mode=Walking&destinations=";
-                    // let distanceURLDriving = distanceURL + "&mode=Driving&destinations=";
                     let travelModeWalking = "Walking"
                     let travelModeDriving = "Driving"
 
@@ -135,7 +143,6 @@
 
                     this.deaList.forEach((dea) => {
                         destinationPointList.push(new google.maps.LatLng(dea.localisation.latitude, dea.localisation.longitude))
-                        // dea.Id = Index++;
                     })
 
                     let service = new google.maps.DistanceMatrixService();

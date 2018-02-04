@@ -1,9 +1,5 @@
 {
     "rules": {
-      "dea":{
-        ".read": true,
-        ".write": false
-      },
       "resource":{
         ".read": true,
         ".write": false
