@@ -8,7 +8,7 @@
 
     </style>
   <template>
-    <paper-toggle-button on-tap="toggleLanguage">[[currentLanguage]]</paper-toggle-button>
+    <paper-toggle-button on-tap="toggleLanguage">[[nextLanguage]]</paper-toggle-button>
   </template>
 
   <script>
@@ -38,8 +38,16 @@
             currentLanguage: {
               type: String,
               statePath: 'uiState.currentLanguage'
+            },
+            nextLanguage: {
+              type: String,
+              computed: 'languageChanged(currentLanguage)'
             }
           };
+        }
+
+        languageChanged(current) {
+          return current === 'fr' ? 'en' : 'fr';
         }
 
         toggleLanguage() {

@@ -1,8 +1,10 @@
 {
 	"en": {
-		"appName": "I-Live"
+		"appName": "I-Live",
+		"address": "Address"
 	},
 	"fr": {
-		"appName": "I-Vie"
+		"appName": "I-Vie",
+		"address": "Addresse"
 	}
 }
