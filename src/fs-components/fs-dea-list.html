@@ -132,6 +132,7 @@
                     let responseOK;
 
                     let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location.longitude);
+                    let destinationPointList = [];
                     let directionsService = new google.maps.DirectionsService;
                     let directionsDisplay = new google.maps.DirectionsRenderer;
 
@@ -154,12 +155,17 @@
                     //         }
                     //     }
                     // )};
+                    
+                    this.deaList.forEach((dea) => {
+                        destinationPointList.push(new google.maps.LatLng(dea.localisation.latitude, dea.localisation.longitude))
+                        // dea.Id = Index++;
+                    })
 
                     let service = new google.maps.DistanceMatrixService();
                     service.getDistanceMatrix(
                     {
                         origins: [originPoint],//[origine1, origine2]
-                        destinations: [originPoint],//[destinationA, destinationB],
+                        destinations: destinationPointList,//[destinationA, destinationB],
                         travelMode: 'DRIVING',
                     }, callback);
 
@@ -172,8 +178,8 @@
                                 var results = response.rows[i].elements;
                                 for (var j = 0; j < results.length; j++) {
                                     var element = results[j];
-                                    var distance = element.distance.text;
-                                    var duration = element.duration.text;
+                                    deaList[j].distanceWalking = element.distance.text;
+                                    deaList[j].timeWalking = element.duration.text;
                                     var from = origins[i];
                                     var to = destinations[j];
                                 }
@@ -184,13 +190,6 @@
 
                     /*directionsService.UnitSystem = UnitSystem.METRIC*/
 
-                    // this.deaList.forEach((dea) => {
-                    //     //Building both URL to get the destinations
-                    //     distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
-                    //     distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
-                    //     dea.Id = Index++;
-
-                    // })
 
                     //Get JSON files with the list of destination information
                    /* fetch(distanceURLWalking)
@@ -210,10 +209,12 @@
 
                     this.deaList.forEach((dea) => {
                         //Add all items on the page
-                        dea.distanceWalking = "1"
-                        dea.timeWalking = "1.1"
-                        dea.distanceDriving = "2"
-                        dea.timeDriving = "2.2"
+
+                        // dea.distanceWalking = "1"
+                        // dea.timeWalking = "1.1"
+                        // dea.distanceDriving = "2"
+                        // dea.timeDriving = "2.2"
+
                         //dea.distanceWalking = jsonWalking.element[dea.Id].distance.text
                         //dea.distanceDriving = jsonDriving.element[dea.Id].distance.text
                         //dea.timeWalking = jsonWalking.element[dea.Id].duration.text
