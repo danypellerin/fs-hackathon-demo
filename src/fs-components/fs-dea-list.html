@@ -197,47 +197,77 @@
                     let deaList = this.deaList;
                     let userLocation = this.userLocation;
                     let deaDetailedList = [];
-                    let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.location.latitude + "," + userLocation.location.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
-                    let distanceURLWalking = distanceURL + "&mode=Walking&destinations=";
-                    let distanceURLDriving = distanceURL + "&mode=Driving&destinations=";
+                    // let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.location.latitude + "," + userLocation.location.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
+                    // let distanceURLWalking = distanceURL + "&mode=Walking&destinations=";
+                    // let distanceURLDriving = distanceURL + "&mode=Driving&destinations=";
                     let travelModeWalking = "Walking"
                     let travelModeDriving = "Driving"
 
                     let Index = 0;
                     let jsonWalking;
                     let jsonDriving;
-                    
+                    let responseOK;
 
                     let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location.longitude);
                     let directionsService = new google.maps.DirectionsService;
                     let directionsDisplay = new google.maps.DirectionsRenderer;
 
-                    directionsService.route = 
-                    (
-                        {
-                            origin: originPoint,
-                            destination: originPoint,
-                            travelMode: 'DRIVING'
-                        },
-                        function(response, status) 
-                        {
-                            if (status === 'OK') {
-                                directionsDisplay.setDirections(response);
-                            } else {
-                                window.alert('Directions request failed due to ' + status);
+                    // calculateAndDisplayRoute(directionsService);
+
+                    // function calculateAndDisplayRoute(directionsService,directionsDisplay) {
+                    // directionsService.route = 
+                    // (
+                    //     {
+                    //         origin: originPoint,
+                    //         destination: originPoint, //multiple destination?
+                    //         travelMode: 'DRIVING'
+                    //     },
+                    //     function(response, status) 
+                    //     {
+                    //         if (status === 'OK') {
+                    //             responseOK = response;
+                    //         } else {
+                    //             window.alert('Directions request failed due to ' + status);
+                    //         }
+                    //     }
+                    // )};
+
+                    let service = new google.maps.DistanceMatrixService();
+                    service.getDistanceMatrix(
+                    {
+                        origins: [originPoint],//[origine1, origine2]
+                        destinations: [originPoint],//[destinationA, destinationB],
+                        travelMode: 'DRIVING',
+                    }, callback);
+
+                    function callback(response, status) {
+                        if (status == 'OK') {
+                            var origins = response.originAddresses;
+                            var destinations = response.destinationAddresses;
+
+                            for (var i = 0; i < origins.length; i++) {
+                                var results = response.rows[i].elements;
+                                for (var j = 0; j < results.length; j++) {
+                                    var element = results[j];
+                                    var distance = element.distance.text;
+                                    var duration = element.duration.text;
+                                    var from = origins[i];
+                                    var to = destinations[j];
+                                }
                             }
                         }
-                    );
+                    }
+                
 
                     /*directionsService.UnitSystem = UnitSystem.METRIC*/
 
-                    this.deaList.forEach((dea) => {
-                        //Building both URL to get the destinations
-                        distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
-                        distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
-                        dea.Id = Index++;
+                    // this.deaList.forEach((dea) => {
+                    //     //Building both URL to get the destinations
+                    //     distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
+                    //     distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
+                    //     dea.Id = Index++;
 
-                    })
+                    // })
 
                     //Get JSON files with the list of destination information
                    /* fetch(distanceURLWalking)
