@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../redux-mixin.html">
 <link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <dom-module id="fs-dea-map">
   <template>
@@ -12,9 +13,19 @@
       google-map {
         height: 93vh;
       }
+
       .popup-detail{
         top : top - 10px
       }
+
+      #navigateButton {
+        position: absolute;
+        bottom: 30px;
+        right: 50px;
+        height: 60px;
+        width: 60px;
+      }
+
     </style>
 
     <google-map id="googleMap" latitude="[[calculatedPosition.latitude]]" longitude="[[calculatedPosition.longitude]]" zoom="[[defaultZoomLevel]]"
@@ -42,6 +53,8 @@
           icon="../../images/pharmacy.png"></google-map-marker>
       </template>
     </google-map>
+
+    <paper-icon-button on-tap="navigateToGoogle" id="navigateButton" src="./images/navigate.png"></paper-icon-button>
   </template>
 
   <script>
@@ -169,9 +182,9 @@
             },
             position: {
               type: Object,
-              value: [],
+              value: {},
               statePath: "selectedLocation",
-              observer: "targetPositionChanged"
+              observer: "selectedLocationChanged"
             },
             userPosition: {
               type: Object,
@@ -180,7 +193,12 @@
             },
             calculatedPosition: {
               type: Object,
-              value: []
+              value: {}
+            },
+            language: {
+              type: String,
+              value: 'en',
+              statePath: "uiState.currentLanguage"
             },
             googleApiLoaded: {
               type: Boolean,
@@ -219,6 +237,36 @@
               ]
             }
           };
+        }
+
+        selectedLocationChanged() {
+          this.createGoogleLinks(this.userPosition, this.position);
+        }
+
+        navigateToGoogle() {
+
+          var url = this.navigationLink;
+          if(url)  {
+            var win = window.open(url, '_blank');
+            win.focus();
+          }
+        }
+
+        createGoogleLinks(current, target) {
+
+            if(typeof current === 'undefined' || typeof target === 'undefined' || this.isSameLocation(current, target)) {
+              this.$.navigateButton.hidden = true;
+              return;
+            }
+
+            var currentString = `${current.latitude},${current.longitude}`;
+            var targetString = `${target.latitude},${target.longitude}`;
+            this.navigationLink = `https://maps.google.com/maps?ll=${currentString}&q=${targetString}&hl=${this.language}&t=h&z=18`;
+            this.$.navigateButton.hidden = false;
+        }
+
+        isSameLocation(loc1, loc2) {
+          return loc1.latitude === loc2.latitude && loc1.longitude === loc2.longitude;
         }
 
         clicked(e, detail, sender) {
