@@ -6,6 +6,7 @@
 <link rel="import" href="reducers/dea.reducer.html">
 <link rel="import" href="reducers/data-loaded.reducer.html">
 <link rel="import" href="reducers/localization.reducer.html">
+<link rel="import" href="reducers/user-location.reducer.html">
 
 <script>
 
@@ -27,7 +28,15 @@
             },
             members: [],
             uiState: {},
-            deaReducer: [],
+            deaLocations: [],
+            userLocation: {
+                errorMessage: '',
+                location: {
+                    latitude: null,
+                    longitude: null,
+                    accuracy: null
+                }
+            },
             dataLoaded: {
                 membersLoaded: false
             }
