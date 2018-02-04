@@ -14,10 +14,27 @@
       }
     </style>
 
-    <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
-      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[resourceFilter]]">
+    <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]"
+      api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+      <!-- DEA -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterDea]]">
         <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
           icon="../../images/aed.png"></google-map-marker>
+      </template>
+      <!-- Fire station -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterFireStation]]">
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/fire-station.png"></google-map-marker>
+      </template>
+      <!-- Police -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPolice]]">
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/police.png"></google-map-marker>
+      </template>
+      <!-- Pharmacy -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPharmacy]]">
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/pharmacy.png"></google-map-marker>
       </template>
     </google-map>
   </template>
@@ -45,8 +62,32 @@
           super();
         }
 
-        resourceFilter(item){
-          if (item.type === "DEA"){
+        filterDea(item) {
+          if (item.type === "DEA") {
+            return true;
+          }
+
+          return false;
+        }
+
+        filterFireStation(item) {
+          if (item.type === "fire_station") {
+            return true;
+          }
+
+          return false;
+        }
+
+        filterPharmacy(item) {
+          if (item.type === "pharmacy") {
+            return true;
+          }
+
+          return false;
+        }
+
+        filterPolice(item) {
+          if (item.type === "police") {
             return true;
           }
 
@@ -105,13 +146,6 @@
                   ]
                 }
               ]
-            },
-            filter: (item) => {
-                if (item.type === "DEA"){
-                  return true;
-                }
-
-                return false;
             }
           };
         }
