@@ -1,12 +1,8 @@
 {
     "rules": {
-      "members": {
+      "dea":{
         ".read": true,
         ".write": false
-      },
-      "notes": {
-        ".read": "auth != null",
-        ".write": "auth != null"
       }
     }
 }
