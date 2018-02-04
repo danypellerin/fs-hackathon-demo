@@ -15,16 +15,15 @@
         <style>
             :host {
                 display: block;
+
             }
 
 
             iron-list {
                 padding-top: 64px;
                 --iron-list-items-container: {
-                    max-width: 800px;
                     margin: auto;
-                    margin-top: 60px;
-                    margin-bottom: 60px;
+                    max-height: 100%;
                     border-bottom: 1px solid #ddd;
                 }
                 ;
@@ -32,35 +31,30 @@
 
             .item {
                 @apply --layout-horizontal;
-                padding: 20px;
+                padding: 1.5em;
                 background-color: white;
                 border: 1px solid #ddd;
                 cursor: pointer;
                 margin-bottom: 10px;
             }
 
-            .avatar {
-                height: 40px;
-                width: 40px;
-                border-radius: 20px;
-                box-sizing: border-box;
-                background-color: #DDD;
-            }
+
 
             .pad {
-                padding: 0 16px;
+                padding: 0 1em;
                 @apply --layout-flex;
                 @apply --layout-vertical;
             }
 
             .primary {
-                font-size: 16px;
+                font-size: 1em;
                 font-weight: bold;
             }
 
             .shortInfo,
+            .endshortInfo,
             .detailInfo {
-                font-size: 14px;
+                font-size: 0.75em;
             }
 
             .detailInfo {
@@ -68,17 +62,21 @@
                 display: none;
             }
 
-            .item:hover .shortInfo::after {
+            .item:hover .endshortInfo::after {
                 content: ' [+]';
                 color: gray;
             }
 
-            .item.expanded:hover .shortInfo::after {
+            .item.expanded:hover .endshortInfo::after {
                 content: '';
             }
 
             .item.expanded .detailInfo {
                 display: block;
+            }
+
+            .item.expanded .endshortInfo {
+                display: none;
             }
 
             .item.expanded:hover .detailInfo::after {
@@ -104,17 +102,27 @@
                 <div>
                     <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
                         <div class="pad">
-                            <div class="primary">Adress: [[dea.adresse]]</div>
-                            <span class="shortInfo">Open</span>
-                        	<span class="shortInfo">distance walking: [[dea.distanceWalking]]</span>
+                            <span class="primary">[[dea.batiment]]</span>
+                            <span class="shortInfo">distance: [[dea.distanceWalking]]</span>  
                         	<span class="shortInfo">time walking: [[dea.timeWalking]]</span>
-                        	<span class="shortInfo">distance driving: [[dea.distanceDriving]]</span>
-                        	<span class="shortInfo">time driving: [[dea.timeDriving]]</span>
-                            <span class="detailInfo">batiment: [[dea.batiment]]</span>
-                            <span class="detailInfo">modele: [[dea.modele]]</span>
-                            <span class="detailInfo">source: [[dea.source]]</span>
+                            <template is="dom-if" if=[[dea.heures]]>
+                                <span class="shortInfo">distance: [[dea.distanceDriving]]</span>
+                                <span class="endshortInfo">[[dea.disponibility]]</span>
+                            </template>
+                            <template is="dom-if" if=[[!dea.heures]]>
+                                    <span class="endshortInfo">distance: [[dea.distanceDriving]]</span>
+                                </template>
+                            <span class="detailInfo">Adress: [[dea.adresse]]</span>
+                            <span class="detailInfo">[[dea.modele]]</span>
+                            <span class="detailInfo">[[dea.source]]</span>
+                            <span class="detailInfo">[[dea.ouverture]]</span>
+
                         </div>
-                        <iron-icon src="../../images/phone.png"></iron-icon>
+                        <template is="dom-if" if=[[dea.telephoneResponsable]]>
+                            <a href="tel:[[dea.telephoneResponsable]]">
+                                <iron-icon src="../../images/phone.png"></iron-icon>
+                            </a>
+                        </template>
                     </div>
                 </div>
             </template>
@@ -184,7 +192,7 @@
                   */
                 _doSomething(param) { }
 
-				deaInfoChanged(newValue, oldValue) {
+                deaInfoChanged(newValue, oldValue) {
 
                     let deaList = this.deaList;
                     let userLocation = this.userLocation;
@@ -228,6 +236,7 @@
                         distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
                         distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
                         dea.Id = Index++;
+
                     })
 
                     //Get JSON files with the list of destination information
@@ -256,6 +265,26 @@
                         //dea.distanceDriving = jsonDriving.element[dea.Id].distance.text
                         //dea.timeWalking = jsonWalking.element[dea.Id].duration.text
                         //dea.timeDriving = jsonDriving.element[dea.Id].duration.text
+
+                        var time = dea.heures;
+                        if (time == null) {
+                        }
+                        else {
+                            dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
+                            var timeDetails = time.fin.split(":");
+                            var timeNow = new Date();
+                            var closeTime = new Date();
+
+                            closeTime.setHours(timeDetails[0], timeDetails[1], 0);
+                            if (timeNow < closeTime) {
+                                dea.disponibility = "Open";
+                            }
+                            else {
+                                dea.disponibility = 'Closed';
+                            }
+                        }
+
+
                         deaDetailedList.push(dea);
                     })
                     this.deaDetailedList = deaDetailedList;
@@ -264,10 +293,6 @@
                 getClassForItem(item, selected) {
                     return selected ? 'item expanded' : 'item';
                 }
-
-
-
-
             }
 
             // Registers the element in the browser
