@@ -89,7 +89,7 @@
     </style>
 
     <div>
-      <div class$="[[getClassForItem(resource, selected)]] info-container">
+      <div class$="[[getClassForItem(resource, selected)]] info-container" on-tap="setSelectedLocation">
         <div class="distance short-info">
             <div>
               <span>[[resource.distanceWalking]]</span>
@@ -169,6 +169,15 @@
 
         getClassForItem(item, selected) {
           return selected ? 'item expanded' : 'item';
+        }
+
+        setSelectedLocation() {
+          const location = this.resource.localisation;
+
+          this.dispatch({
+              type: 'SELECTED_POSITION_CHANGED',
+              value: location
+          });
         }
 
       }
