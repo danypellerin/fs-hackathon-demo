@@ -14,22 +14,22 @@
       }
     </style>
 
-    <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" fit-to-markers api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+    <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
       <template is="dom-repeat" items="[[filteredDeas]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" icon="../../images/aed.png"></google-map-marker>
       </template>
     </google-map>
   </template>
 
   <script>
     (function () {
+      const DEFAULT_ZOOM_LEVEL = 17;
 
       /**
        * Shows the DEA on a map
        * @polymer
        */
       class FsDeaMap extends ReduxMixin(Polymer.Element) {
-
         /**
          * Defines the name of the element
          * @return {string} Element name
@@ -52,6 +52,11 @@
          */
         static get properties() {
           return {
+            defaultZoomLevel: {
+              type: Number,
+              readOnly: true,
+              value: DEFAULT_ZOOM_LEVEL
+            },
             filteredDeas: {
               type: Array,
               value: [
