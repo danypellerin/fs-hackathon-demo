@@ -1,10 +1,14 @@
 {
 	"en": {
 		"appName": "I-Live",
-		"address": "Address"
+		"address": "Address",
+		"hurry": "Will close soon",
+		"closed": "Closed"
 	},
 	"fr": {
 		"appName": "I-Vie",
-		"address": "Addresse"
+		"address": "Addresse",
+		"hurry": "Fermeture imminente",
+		"opened": "Ouvert"
 	}
 }
