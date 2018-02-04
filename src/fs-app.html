@@ -153,6 +153,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <fs-database-loading></fs-database-loading>
     <fs-network-status></fs-network-status>
+    <google-maps-api id="googapis" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0" version="3.exp"></google-maps-api>
   </template>
 
   <script>
@@ -178,7 +179,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String,
-        };        
+        };
       }
 
       static get observers() {
@@ -196,6 +197,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         // Log the state changes of the store in the console.
         this.addEventListener('state-changed', event => console.log('///--- APPLICATION STATE CHANGED ---///', this.getState()));
         this.loadResources(this.resolveUrl('localization.json'));
+      }
+
+      ready() {
+        super.ready();
+
+        const mapsApi = this.$.googapis;
+        mapsApi.addEventListener('api-load', (e) => {
+          this.dispatch({
+              type: 'MAPS_API_READY',
+              value: true
+          });
+        });
       }
 
       _routePageChanged(page) {

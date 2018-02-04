@@ -1,9 +1,18 @@
 <script>
     (function() {
 
-        const uiStateReducer = (state = {}, action) => {
+        const uiState = {
+            mapsLoaded: false
+        };
+
+        const uiStateReducer = (state = uiState, action) => {
 
             switch (action.type) {
+
+                case 'MAPS_API_READY':
+                    return Object.assign({}, state, {
+                        mapsLoaded: action.value
+                    });
 
                 default:
                     return state;
