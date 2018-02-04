@@ -1,0 +1,301 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<dom-module id="fs-dea-map">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      google-map {
+        height: 93vh;
+      }
+
+      .popup-detail{
+        top : top - 10px
+      }
+
+      #navigateButton {
+        position: absolute;
+        bottom: 30px;
+        right: 50px;
+        height: 60px;
+        width: 60px;
+      }
+
+    </style>
+
+    <google-map id="googleMap" latitude="[[calculatedPosition.latitude]]" longitude="[[calculatedPosition.longitude]]" zoom="[[defaultZoomLevel]]"
+      styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+      <google-map-marker latitude="[[userPosition.latitude]]" longitude="[[userPosition.longitude]]" draggable="false" icon="../../images/position.png">
+      </google-map-marker>
+      <!-- DEA -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterDea]]">
+        <google-map-marker id="marker-[[index]]" latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]"
+          draggable="false" click-events="true" on-google-map-marker-click="clicked" icon="../../images/aed.png"> </google-map-marker>
+      </template>
+      <!-- Fire station -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterFireStation]]">
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/fire-station.png"></google-map-marker>
+      </template>
+      <!-- Police -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPolice]]">
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/police.png"></google-map-marker>
+      </template>
+      <!-- Pharmacy -->
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPharmacy]]">
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
+          icon="../../images/pharmacy.png"></google-map-marker>
+      </template>
+    </google-map>
+
+    <paper-icon-button on-tap="navigateToGoogle" id="navigateButton" src="./images/navigate.png"></paper-icon-button>
+  </template>
+
+  <script>
+    (function () {
+      const DEFAULT_ZOOM_LEVEL = 17;
+      let infoWindow = [];
+      /**
+       * Shows the DEA on a map
+       * @polymer
+       */
+      class FsDeaMap extends ReduxMixin(Polymer.Element) {
+        /**
+         * Defines the name of the element
+         * @return {string} Element name
+         */
+        static get is() { return 'fs-dea-map'; }
+
+        /**
+         * Constructor => Lifecycle
+         * Initialization of some things could be done here
+         */
+        constructor() {
+          super();
+        }
+
+        setInfoWindows() {
+          infoWindow = [];
+          for (let index = 0; index < this.filteredDeas.length; index++) {
+            let element = this.filteredDeas[index];
+            let batiment = "";
+            let adresse = "";
+            let telephoneResponsable = "";
+            if(element.batiment !== undefined){
+                batiment = element.batiment;
+            }
+            if(element.adresse !== undefined){
+              adresse = element.adresse;
+            }
+            if(element.telephoneResponsable !== undefined){
+              telephoneResponsable = element.telephoneResponsable;
+            }
+
+            infoWindow.push(new google.maps.InfoWindow(
+              {
+
+                content: "<span class=popup-detail>" +batiment + "<br>" + adresse + "<br>" + telephoneResponsable +"</span>",
+                position: {
+                  lat: element.localisation.latitude,
+                  lng: element.localisation.longitude
+                },
+                pixelOffset: new google.maps.Size(0,-25)                
+              }
+            )
+            );
+          }
+        }
+
+        filterDea(item) {
+          if (item.type === "DEA") {
+            return true;
+          }
+
+          return false;
+        }
+
+        filterFireStation(item) {
+          if (item.type === "fire_station") {
+            return true;
+          }
+
+          return false;
+        }
+
+        filterPharmacy(item) {
+          if (item.type === "pharmacy") {
+            return true;
+          }
+
+          return false;
+        }
+
+        filterPolice(item) {
+          if (item.type === "police") {
+            return true;
+          }
+
+          return false;
+        }
+
+        targetPositionChanged(position) {
+          if (!this.googleApiLoaded) {
+            return;
+          }
+
+
+
+          if (position) {
+
+            let newPosition = {
+              latitude: position.latitude,
+              longitude: position.longitude
+            }
+
+            this.calculatedPosition = newPosition;
+          } else {
+
+            let newerPosition = {
+              latitude: userLocation.location.latitude,
+              longitude: userLocation.location.longitude
+            }
+
+            this.calculatedPosition = newerPosition;
+          }
+        }
+
+        mapsApiLoaded() {
+          if (this.googleApiLoaded) {
+            this.targetPositionChanged(this.position);
+          }
+        }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-custom-element
+                      prop1="something" >
+                   </fs-custom-element>
+         */
+        static get properties() {
+          return {
+            defaultZoomLevel: {
+              type: Number,
+              readOnly: true,
+              value: DEFAULT_ZOOM_LEVEL
+            },
+            filteredDeas: {
+              type: Array,
+              value: [],
+              statePath: "resource",
+              observer: "setInfoWindows"
+            },
+            position: {
+              type: Object,
+              value: {},
+              statePath: "selectedLocation",
+              observer: "selectedLocationChanged"
+            },
+            userPosition: {
+              type: Object,
+              value: {},
+              statePath: "userLocation.location"
+            },
+            calculatedPosition: {
+              type: Object,
+              value: {}
+            },
+            language: {
+              type: String,
+              value: 'en',
+              statePath: "uiState.currentLanguage"
+            },
+            googleApiLoaded: {
+              type: Boolean,
+              value: false,
+              observer: 'mapsApiLoaded',
+              statePath: 'uiState.mapsLoaded'
+            },
+            mapStyle: {
+              type: Array,
+              value: [
+                {
+                  featureType: "administrative",
+                  elementType: "labels",
+                  stylers: [
+                    { visibility: "off" }
+                  ]
+                }, {
+                  featureType: "poi",
+                  elementType: "labels",
+                  stylers: [
+                    { visibility: "off" }
+                  ]
+                }, {
+                  featureType: "water",
+                  elementType: "labels",
+                  stylers: [
+                    { visibility: "off" }
+                  ]
+                }, {
+                  featureType: "road",
+                  elementType: "labels",
+                  stylers: [
+                    { visibility: "off" }
+                  ]
+                }
+              ]
+            }
+          };
+        }
+
+        selectedLocationChanged() {
+          this.createGoogleLinks(this.userPosition, this.position);
+        }
+
+        navigateToGoogle() {
+
+          var url = this.navigationLink;
+          if(url)  {
+            var win = window.open(url, '_blank');
+            win.focus();
+          }
+        }
+
+        createGoogleLinks(current, target) {
+
+            if(typeof current === 'undefined' || typeof target === 'undefined' || this.isSameLocation(current, target)) {
+              this.$.navigateButton.hidden = true;
+              return;
+            }
+
+            var currentString = `${current.latitude},${current.longitude}`;
+            var targetString = `${target.latitude},${target.longitude}`;
+            this.navigationLink = `https://maps.google.com/maps?ll=${currentString}&q=${targetString}&hl=${this.language}&t=h&z=18`;
+            this.$.navigateButton.hidden = false;
+        }
+
+        isSameLocation(loc1, loc2) {
+          return loc1.latitude === loc2.latitude && loc1.longitude === loc2.longitude;
+        }
+
+        clicked(e, detail, sender) {
+          let id = parseInt(e.target.id.replace('marker-',''));
+
+         if(!infoWindow[id].view){
+          infoWindow[id].open(this.$.googleMap, e.target);
+         }
+        }
+      }
+      // Registers the element in the browser
+      customElements.define(FsDeaMap.is, FsDeaMap);
+
+    })();
+  </script>
+
+</dom-module>

@@ -1,9 +1,25 @@
 <script>
     (function() {
 
-        const uiStateReducer = (state = {}, action) => {
+        const uiState = {
+            mapsLoaded: false,
+            currentLanguage: 'fr'
+        };
+
+        const uiStateReducer = (state = uiState, action) => {
 
             switch (action.type) {
+
+                case 'MAPS_API_READY':
+                    return Object.assign({}, state, {
+                        mapsLoaded: action.value
+                    });
+
+                case 'TOGGLE_LANGUAGE':
+                    var nextLanguage = state.currentLanguage === 'en' ? 'fr' : 'en';
+                    return Object.assign({}, state, {
+                        currentLanguage: nextLanguage
+                    });
 
                 default:
                     return state;

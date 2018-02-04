@@ -1,0 +1,315 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="./fs-resource-list-item.html">
+
+<dom-module id="fs-dea-list">
+    <template>
+
+        <style>
+            :host {
+                display: block;
+            }
+
+            iron-list {
+                height: 93vh;
+                padding-top: 64px;
+                --iron-list-items-container: {
+                    margin: auto;
+                    max-height: 100%;
+                    border-bottom: 1px solid #ddd;
+                };
+            }
+
+            @media (max-width: 460px) {
+                paper-toolbar .bottom.title {
+                    font-size: 14px;
+                }
+            }
+
+            iron-list {
+                padding-top: 0;
+            }
+        </style>
+
+
+        <!-- HTML template here -->
+        <iron-list items="[[deaDetailedList]]" as="dea" selection-enabled multi-selection>
+            <template>
+                <fs-resource-list-item
+                    resource="[[dea]]"
+                    selected="[[selected]]"
+                    tabIndex="[[tabIndex]]">
+                </fs-resource-list-item>
+            </template>
+        </iron-list>
+    </template>
+
+    <script>
+        (function () {
+
+            /**
+             * Class to be used as a Template for new elements
+             * @polymer
+             */
+            class FSDeaList extends ReduxMixin(Polymer.Element) { // Custom element definition
+
+                /**
+                 * Defines the name of the element: <fs-dea-list></fs-dea-list>.
+                 * @return {string} name that the element will use.
+                 */
+                static get is() {
+                    return 'fs-dea-list';
+                }
+
+                /**
+                 * @return {object} properties- Polymer properties
+                 */
+                static get properties() {
+                    return {
+                        deaList: {
+                            type: Array,
+                            value: []
+                        },
+                        resourceList: {
+                            type: Array,
+                            value: [],
+                            statePath: "resource",
+                            observer: "deaInfoChanged"
+                        },
+                        userLocation: {
+                            type: Object,
+                            statePath: "userLocation",
+                            observer: "deaInfoChanged"
+                        },
+                        currentLocation: {
+                            type: Object,
+                            statePath: "selectedLocation",
+                            observer: "deaInfoChanged"
+                        },
+                        deaDetailedList: {
+                            type: Array,
+                            value: []
+                        },
+                        googleApiLoaded: {
+                            type: Boolean,
+                            value: false,
+                            observer: 'mapsApiLoaded',
+                            statePath: 'uiState.mapsLoaded'
+                        }
+                    };
+                }
+
+                mapsApiLoaded() {
+                    if (this.googleApiLoaded) {
+                        this.deaInfoChanged(this.userLocation);
+                    }
+                }
+
+                deaInfoChanged(newValue, oldValue) {
+
+                    if (!this.googleApiLoaded) {
+                        return;
+                    }
+
+                    this.deaList = [];
+
+                    this.resourceList.forEach((resource => {
+                        if (resource.type === "DEA") {
+                            this.deaList.push(resource);
+                        }
+                    }));
+
+                    let userLocation = this.userLocation;
+                    let selectedLocation = this.selectedLocation || this.userLocation.location;
+                    let deaDetailedList = [];
+                    let travelModeWalking = "Walking"
+                    let travelModeDriving = "Driving"
+
+                    let Index = 0;
+                    let jsonWalking;
+                    let jsonDriving;
+                    let responseOK;
+
+                    let originPoint = new google.maps.LatLng(selectedLocation.latitude, selectedLocation.longitude);
+                    let destinationPointList = [];
+                    let directionsService = new google.maps.DirectionsService;
+                    let directionsDisplay = new google.maps.DirectionsRenderer;
+
+                    this.deaList.forEach((dea) => {
+                        destinationPointList.push(new google.maps.LatLng(dea.localisation.latitude,
+                            dea.localisation.longitude))
+                    })
+
+                    let service = new google.maps.DistanceMatrixService();
+                    service.getDistanceMatrix({
+                        origins: [originPoint], //[origine1, origine2]
+                        destinations: destinationPointList, //[destinationA, destinationB],
+                        travelMode: 'WALKING',
+                    }, (response, status) => this.GetWalkingGeoStats(response, status));
+
+                    service.getDistanceMatrix({
+                        origins: [originPoint], //[origine1, origine2]
+                        destinations: destinationPointList, //[destinationA, destinationB],
+                        travelMode: 'DRIVING',
+                    }, (response, status) => this.GetDrivingGeoStats(response, status));
+                }
+
+                GetWalkingGeoStats(response, status) {
+                    let result = [];
+                    let minute;
+                    let minuteIndex;
+                    let hour;
+                    let hourIndex;
+                    let day;
+                    let dayIndex;
+
+                    if (status == 'OK') {
+                        var origins = response.originAddresses;
+                        var destinations = response.destinationAddresses;
+
+                        for (var i = 0; i < origins.length; i++) {
+                            var results = response.rows[i].elements;
+                            for (var j = 0; j < results.length; j++) {
+                                let minute = 0;
+                                let hour = 0;
+                                let day = 0;
+
+                                var element = results[j];
+                                this.deaList[j].distanceWalking = element.distance.text;
+
+                                //Create a TimeStamp value for the order by later
+                                minuteIndex = element.duration.text.search("minute");
+                                if (minuteIndex > -1) {
+                                    minute = element.duration.text.substring(minuteIndex - 3, minuteIndex - 1);
+                                }
+                                
+                                hourIndex = element.duration.text.search("heure");
+                                if (hourIndex == -1) {
+                                    hourIndex = element.duration.text.search("hour");
+                                }
+
+                                if (hourIndex > -1) {
+                                    hour = element.duration.text.substring(hourIndex - 3, hourIndex - 1);
+                                }
+
+                                dayIndex = element.duration.text.search("jour");
+                                if (dayIndex == -1) {
+                                    dayIndex = element.duration.text.search("day");
+                                }
+
+                                if (dayIndex > -1) {
+                                    day = element.duration.text.substring(dayIndex - 3, dayIndex - 1);
+                                }
+
+                                //If the duration is more than 1 hour, we show only ">1h"
+                                if (element.duration.text.search("heure") > -1 || element.duration.text.search("hour") > -1) {
+                                    this.deaList[j].timeWalking = ">1h";
+                                }
+                                else{
+                                    this.deaList[j].timeWalking = element.duration.text.replace("minutes","min").replace("minute","min");
+                                }
+                                var from = origins[i];
+                                var to = destinations[j];
+                            }
+                        }
+
+                        this.deaList.forEach((dea) => {
+                            let time = dea.heures;
+                            let timeBeforeOpen;
+                            let timeBeforeClose;
+
+                            if (time != null) {
+                                dea.ouverture = dea.heures.debut + ' - ' + dea.heures.fin;
+                                let timeCloseDetails = time.fin.split(":");
+                                let timeOpenDetails = time.debut.split(":");
+                                let timeNow = new Date();
+                                let openTime = new Date();
+                                let closeTime = new Date();
+                                let timeBeforeOpenWalking;                                  
+                                let timeBeforeCloseWalking;
+
+                                //Set Close and Open time
+                                closeTime.setHours(timeCloseDetails[0], timeCloseDetails[1], 0);
+                                openTime.setHours(timeOpenDetails[0], timeOpenDetails[1], 0);
+
+                                //Calculate how many minutes we have before it opened or closed
+                                timeBeforeClose = (timeNow - closeTime) / 1000 / 60;
+                                timeBeforeOpen = (timeNow - openTime) / 1000 / 60;
+
+                                if (timeBeforeOpen > 0 && timeBeforeClose < -15) {
+                                    dea.disponibility = "open";
+                                    dea.isOpen = 1;
+
+                                    //Calculate if we have enough time to reach the destination by walking
+                                    timeNow = timeNow.setMinutes(timeNow.getMinutes() + dea.timestampWalking);
+                                    timeBeforeOpenWalking = (timeNow - openTime) / 1000 / 60
+                                    timeBeforeCloseWalking = (timeNow - closeTime) / 1000 / 60
+                                
+
+                                    if (timeBeforeOpenWalking > 0 && timeBeforeCloseWalking > -15 && timeBeforeCloseWalking <= 0) {
+                                        dea.disponibility = "hurry";
+                                    }
+                                }
+                                else {
+                                    dea.disponibility = "closed";
+                                    dea.isOpen = 0;
+                                }
+                            }
+                            else {
+                                dea.disponibility = "open";
+                                dea.isOpen = 1;
+                            }
+
+                            result.push(dea);
+                        });
+
+                        this.deaDetailedList = result;
+                    }
+                }
+
+                GetDrivingGeoStats(response, status) {
+                    let result = [];
+                    if (status == 'OK') {
+                        var origins = response.originAddresses;
+                        var destinations = response.destinationAddresses;
+
+                        for (var i = 0; i < origins.length; i++) {
+                            var results = response.rows[i].elements;
+                            for (var j = 0; j < results.length; j++) {
+                                var element = results[j];
+                                this.deaList[j].distanceDriving = element.distance.text;
+
+                                if (element.duration.text.search("heures") > -1){
+                                    this.deaList[j].timeDriving = ">1h";
+                                }
+                                else{
+                                    this.deaList[j].timeDriving = element.duration.text.replace("minutes","min").replace("minute","min");
+                                }
+                                var from = origins[i];
+                                var to = destinations[j];
+                            }
+                        }
+
+                        this.deaList.forEach((dea) => {
+                            result.push(dea);
+                        });
+
+                        //Sort the list by walking time desc
+                        result = _.sortByOrder(result,['isOpen', 'timestampWalking'], ['desc','asc']);
+                        this.deaDetailedList = result;
+                    }
+                }
+            }
+
+            // Registers the element in the browser
+            customElements.define(FSDeaList.is, FSDeaList);
+
+        })();
+    </script>
+
+</dom-module>

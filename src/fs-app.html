@@ -20,10 +20,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
 <link rel="import" href="fs-icons.html">
 <link rel="import" href="redux-mixin.html">
 <link rel="import" href="data/fs-database-loading.html">
 <link rel="import" href="fs-components/fs-network-status.html">
+<link rel="import" href="fs-components/fs-dea-list.html">
+<link rel="import" href="fs-components/fs-lang-toggle-button.html">
 
 <link rel="lazy-import" href="fs-view1.html">
 <link rel="lazy-import" href="fs-view2.html">
@@ -39,7 +43,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       :host {
         --app-primary-color: #4285f4;
         --app-secondary-color: black;
-
+        --app-drawer-width: 330px;
         display: block;
       }
 
@@ -54,6 +58,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       app-header paper-icon-button {
         --paper-icon-button-ink-color: white;
+      }
+
+      paper-button.emergency {
+        background-color: red;
+        padding: 0;
+      }
+
+      .urgence-container {
+        height: 100%;
+      }
+
+      .urgence-container a {
+        color: #FFFFFF;
+        text-decoration: none;
+        display: block;
+        height: 100%;
+      }
+
+      .urgence-container a paper-button {
+        height: 100%;
+        font-size: 37px;
       }
 
       .drawer-list {
@@ -72,6 +97,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: black;
         font-weight: bold;
       }
+
+      .emergency iron-icon {
+        width: 48px;
+        height: 48px;
+        margin-right: 20px;
+        margin-top: 5px;
+      }
+
+      h3 {
+        margin-left: 15px;
+      }
+
+      fs-lang-toggle-button {
+        position: absolute;
+        right: 15px;
+        top: 2px;
+        text-transform: uppercase;
+        --paper-toggle-button-checked-bar-color: rgb(66,133,244);
+        --paper-toggle-button-checked-button-color: rgb(66,133,244);
+        --paper-toggle-button-checked-ink-color: rgb(66,133,244);
+      }
+
+      .title {
+        position: relative;
+      }
+
     </style>
 
     <firebase-app
@@ -96,12 +147,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-drawer-layout fullbleed narrow="{{narrow}}">
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-        <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="view1" href="[[rootPath]]view1">View One</a>
-          <a name="view2" href="[[rootPath]]view2">View Two</a>
-          <a name="view3" href="[[rootPath]]view3">View Three</a>
-        </iron-selector>
+        <div class="title">
+          <h3>Resources</h3>
+          <fs-lang-toggle-button></fs-lang-toggle-button>
+        </div>
+        <fs-dea-list></fs-dea-list>
       </app-drawer>
 
       <!-- Main content -->
@@ -109,8 +159,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
+            <div main-title style="width:100%;">[[localize('appName')]]</div>
+            <!-- <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button> -->
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
-            <div main-title>My App</div>
+            <div class="urgence-container">
+              <a href="tel:18196684976">
+                <paper-button class="emergency"><iron-icon src="./images/phone-64x64.png"></iron-icon>911</paper-button>
+              </a>
+          </div>
           </app-toolbar>
         </app-header>
 
@@ -120,8 +176,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             fallback-selection="view404"
             role="main">
           <fs-view1 name="view1"></fs-view1>
-          <fs-view2 name="view2"></fs-view2>
-          <fs-view3 name="view3"></fs-view3>
+          <!--fs-view2 name="view2"></fs-view2-->
+          <!-- <fs-view3 name="view3"></fs-view3> -->
           <fs-view404 name="view404"></fs-view404>
         </iron-pages>
       </app-header-layout>
@@ -129,18 +185,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <fs-database-loading></fs-database-loading>
     <fs-network-status></fs-network-status>
+    <google-maps-api id="googapis" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0" version="3.exp"></google-maps-api>
   </template>
 
   <script>
-    class FsApp extends ReduxMixin(Polymer.Element) {
+    class FsApp extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior],  ReduxMixin(Polymer.Element)) {
       static get is() { return 'fs-app'; }
 
       static get properties() {
         return {
+          language: {
+            value: 'en',
+            statePath: 'uiState.currentLanguage'
+          },
           page: {
             type: String,
             reflectToAttribute: true,
             observer: '_pageChanged',
+          },
+          appName: {
+            type: String,
+            statePath: 'appInfo.appName',
           },
           routeData: Object,
           subroute: String,
@@ -156,6 +221,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         ];
       }
 
+
       constructor() {
         super();
 
@@ -163,6 +229,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         // Log the state changes of the store in the console.
         this.addEventListener('state-changed', event => console.log('///--- APPLICATION STATE CHANGED ---///', this.getState()));
+        this.loadResources(this.resolveUrl('localization.json'));
+      }
+
+      ready() {
+        super.ready();
+
+        const mapsApi = this.$.googapis;
+        mapsApi.addEventListener('api-load', (e) => {
+          this.dispatch({
+              type: 'MAPS_API_READY',
+              value: true
+          });
+        });
       }
 
       _routePageChanged(page) {

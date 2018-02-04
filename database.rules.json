@@ -1,12 +1,24 @@
 {
     "rules": {
-      "members": {
+      "resource":{
         ".read": true,
         ".write": false
       },
-      "notes": {
-        ".read": "auth != null",
-        ".write": "auth != null"
+      "resourceTypes":{
+        ".read": true,
+        ".write": false
+      },
+      "secouriste":{
+        ".read": true,
+        ".write": false
+      },
+      "typeUrgence":{
+        ".read": true,
+        ".write": false
+      },
+      "urgence":{
+        ".read": true,
+        ".write": false
       }
     }
 }

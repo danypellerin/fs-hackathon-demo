@@ -1,0 +1,229 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-resource-list-item">
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+
+      .item {
+        @apply --layout-horizontal;
+        padding: 15px;
+        background-color: white;
+        cursor: pointer;
+      }
+
+      .item:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .item:focus {
+        outline: none;
+        background: rgba(0, 0, 0, 0.15);
+      }
+
+      .primary {
+        font-size: 1em;
+        font-weight: bold;
+      }
+
+      .short-info,
+      .detailed-info {
+        font-size: 0.75em;
+      }
+
+      .end-short-info {
+        font-size: 0.75em;
+        color: green;
+      }
+
+      .end-short-infoClose{
+        font-size: 0.75em;
+        color: red;
+      }
+
+      .end-short-infoHurry{
+        font-size: 0.75em;
+        color: orange;
+      }
+
+      .detailed-info {
+        color: gray;
+        display: none;
+      }
+
+      .item.expanded:hover .end-short-info::after {
+        content: '';
+      }
+
+      .item.expanded .detailed-info {
+        display: block;
+      }
+
+      .item.expanded .end-short-info {
+        display: none;
+      }
+
+      .item.expanded:hover .detailed-info::after {
+        content: '';
+      }
+
+      .info-container {
+        display: flex;
+        justify-content: flex-start;
+        position: relative;
+      }
+
+      .info-container .distance {
+        width: 80px;
+        flex-shrink: 0;
+        margin-right: 5px;
+      }
+
+      .info-container .info-content {
+        width: 60%;
+      }
+
+      .phone-icon {
+        height: 36px;
+        width: 36px;
+      }
+
+      .phone-container {
+        position: absolute;
+        right: 5px;
+      }
+
+      .spacer {
+        @apply --layout-flex;
+      }
+
+      .car {
+        height: 16px;
+        width: 16px;
+        margin-left: 5px;
+        margin-right: 3px;
+      }
+
+    </style>
+
+    <div>
+      <div class$="[[getClassForItem(resource, selected)]] info-container" on-tap="setSelectedLocation">
+        <div class="distance short-info">
+            <div>
+              <iron-icon src="./images/walking.png"></iron-icon>
+              <span>[[resource.timeWalking]]</span>
+            </div>
+            <div>
+              <iron-icon class="car" src="./images/car.png"></iron-icon>
+              <span>[[resource.timeDriving]]</span>
+            </div>
+        </div>
+        <div class="info-content">
+          <div><span class="primary">[[resource.batiment]]</span></div>
+          <span class$="[[getClassForDisponibilityText(resource)]]">[[resource.disponibility]]</span>
+
+          <div class="detailed-info">
+            <div><span>[[resource.adresse]]</span></div>
+            <div><span>[[resource.modele]]</span></div>
+            <div><span>[[resource.source]]</span></div>
+            <div><span>[[resource.ouverture]]</span></div>
+          </div>
+
+        </div>
+        <div class="phone-container">
+          <template is="dom-if" if=[[resource.telephoneResponsable]]>
+            <a href="tel:[[resource.telephoneResponsable]]">
+              <iron-icon class="phone-icon" src="./images/phone.png"></iron-icon>
+            </a>
+          </template>
+        </div>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    (function () {
+
+      /**
+       * Class to be used as a Template for new elements
+       * @polymer
+       */
+      class FSResourceListItem extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior], ReduxMixin(Polymer.Element)) {
+
+        /**
+         * Defines the name of the element: <fs-resource-list-item></fs-resource-list-item>.
+         * @return {string} name that the element will use.
+         */
+        static get is() {
+          return 'fs-resource-list-item';
+        }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-resource-list-item
+                      resource=""
+                      selected="true"
+                      tabIndex="0">
+                   </fs-resource-list-item>
+         */
+        static get properties() {
+          return {
+            resource: {
+              type: String,
+              value: {}
+            },
+            selected: {
+              type: Boolean,
+              value: false
+            },
+            tabIndex: {
+              type: Number,
+              value: 0
+            }
+          };
+        }
+
+        getClassForItem(item, selected) {
+          if (selected){
+            return 'item expanded';
+          }
+          else{
+            return 'item';
+          }
+        }
+
+        getClassForDisponibilityText(item) {
+          if (item.disponibility === 'Closed'){
+            return 'end-short-infoClose';
+          }
+          if (item.disponibility === 'Hurry'){
+            return 'end-short-infoHurry';
+          }
+          else{
+            return 'end-short-info';
+          }
+        }
+
+        setSelectedLocation() {
+          const location = this.resource.localisation;
+          this.dispatch({
+              type: 'SELECTED_POSITION_CHANGED',
+              value: location
+          });
+        }
+
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSResourceListItem.is, FSResourceListItem);
+
+    })();
+  </script>
+
+</dom-module>

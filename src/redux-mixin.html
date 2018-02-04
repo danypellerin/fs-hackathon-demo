@@ -1,9 +1,11 @@
 <link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
 <script src="../node_modules/redux/dist/redux.js"></script>
 <link rel="import" href="reducers/app-info.reducer.html">
-<link rel="import" href="reducers/members.reducer.html">
 <link rel="import" href="reducers/ui-state.reducer.html">
+<link rel="import" href="reducers/resource.reducer.html">
 <link rel="import" href="reducers/data-loaded.reducer.html">
+<link rel="import" href="reducers/user-location.reducer.html">
+<link rel="import" href="reducers/selected-location.reducer.html">
 
 <script>
 
@@ -24,7 +26,15 @@
                 isNetworkOnline: false
             },
             members: [],
-            uiState: {},
+            uiState: {
+                mapsLoaded,
+                currentLanguage
+            },
+            resource: [],
+            selectedLocation: {
+                latitude: 46,
+                longitude: -72
+            },
             dataLoaded: {
                 membersLoaded: false
             }

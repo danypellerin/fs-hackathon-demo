@@ -1,7 +1,7 @@
 {
-  "name": "Fs App",
-  "short_name": "Fs App",
-  "description": "Fs hackathon app",
+  "name": "I-Vie",
+  "short_name": "I-Vie",
+  "description": "Shawinigan hackathon app developed by Factorians.",
   "icons": [
     {
       "src": "images/manifest/icon-192x192.png",
@@ -16,6 +16,6 @@
   ],
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#3f51b5",
-  "background_color": "#3f51b5"
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff"
 }

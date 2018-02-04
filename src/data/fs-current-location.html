@@ -1,0 +1,108 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-current-location">
+    <template>
+        <app-indexeddb-mirror key="[[currentUserLocation]]" data="{{userLocation}}" persisted-data="{{persistedData}}"></app-indexeddb-mirror>
+    </template>
+
+    <script>
+
+        (function () {
+
+            let userLocationSet = false;
+
+            /**
+             * Class to be used as a Template for new elements
+             * @polymer
+             */
+            class FSCurrentLocation extends ReduxMixin(Polymer.Element) { // Custom element definition
+
+                /**
+                 * Defines the name of the element: <fs-current-location></fs-current-location>.
+                 * @return {string} name that the element will use.
+                 */
+                static get is() {
+                    return 'fs-current-location';
+                }
+
+                ready() {
+                    super.ready();
+
+                    // Initialize things here
+                    if (navigator.geolocation) {
+
+                        var options = {
+                            enableHighAccuracy: true,
+                            timeout: 5000,
+                            maximumAge: 0
+                        };
+
+                        navigator.geolocation.getCurrentPosition(this.success.bind(this), this.error.bind(
+                            this), options);
+                    }
+                }
+
+                success(position) {
+                    this.dispatch({
+                        type: 'UPDATE_USER_LOCATION',
+                        value: position.coords
+                    });
+
+                    if(!userLocationSet) {
+                        userLocationSet = true;
+
+                        var newLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+
+                        this.dispatch({
+                            type: 'SELECTED_POSITION_CHANGED',
+                            value: newLocation
+                        });
+                    }
+                }
+
+                error(err) {
+                    this.dispatch({
+                        type: 'UPDATE_USER_LOCATION_ERROR',
+                        value: err.message
+                    });
+                }
+
+                /**
+                 * @return {object} properties- Polymer properties
+                 * Useage: <fs-current-location
+                              userLocation="something" >
+                           </fs-current-location>
+                 */
+                static get properties() {
+                    return {
+                        userLocation: {
+                            type: Object,
+                            value: {}
+                        },
+                        persistedData: {
+                            type: Object,
+                            observer: '_loadData',
+                        }
+                    };
+                }
+
+                _loadData(data) {
+
+                    if (!_.isEmpty(data)) {
+                        this.dispatch(updateUserLocation, data);
+                    }
+
+                }
+            }
+
+            // Registers the element in the browser
+            customElements.define(FSCurrentLocation.is, FSCurrentLocation);
+
+        })();
+    </script>
+
+</dom-module>
