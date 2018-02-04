@@ -1,0 +1,154 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-resource-list-item">
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+
+      .item {
+                @apply --layout-horizontal;
+                padding: 1.5em;
+                background-color: white;
+                border: 1px solid #ddd;
+                cursor: pointer;
+                margin-bottom: 10px;
+            }
+
+
+
+            .pad {
+                padding: 0 1em;
+                @apply --layout-flex;
+                @apply --layout-vertical;
+            }
+
+            .primary {
+                font-size: 1em;
+                font-weight: bold;
+            }
+
+            .shortInfo,
+            .endshortInfo,
+            .detailInfo {
+                font-size: 0.75em;
+            }
+
+            .detailInfo {
+                color: gray;
+                display: none;
+            }
+
+            .item:hover .endshortInfo::after {
+                content: ' [+]';
+                color: gray;
+            }
+
+            .item.expanded:hover .endshortInfo::after {
+                content: '';
+            }
+
+            .item.expanded .detailInfo {
+                display: block;
+            }
+
+            .item.expanded .endshortInfo {
+                display: none;
+            }
+
+            .item.expanded:hover .detailInfo::after {
+                content: '';
+            }
+
+            .spacer {
+                @apply --layout-flex;
+            }
+    </style>
+
+    <div>
+      <div class$="[[getClassForItem(resource, selected)]]" tabindex$="[[tabIndex]]">
+        <div class="pad">
+          <span class="primary">[[resource.batiment]]</span>
+          <span class="shortInfo">distance: [[resource.distanceWalking]]</span>
+          <span class="shortInfo">time walking: [[resource.timeWalking]]</span>
+          <template is="dom-if" if=[[resource.heures]]>
+            <span class="shortInfo">distance: [[resource.distanceDriving]]</span>
+            <span class="endshortInfo">[[resource.disponibility]]</span>
+          </template>
+          <template is="dom-if" if=[[!resource.heures]]>
+            <span class="endshortInfo">distance: [[resource.distanceDriving]]</span>
+          </template>
+          <span class="detailInfo">Adress: [[resource.adresse]]</span>
+          <span class="detailInfo">[[resource.modele]]</span>
+          <span class="detailInfo">[[resource.source]]</span>
+          <span class="detailInfo">[[resource.ouverture]]</span>
+
+        </div>
+        <template is="dom-if" if=[[resource.telephoneResponsable]]>
+          <a href="tel:[[resource.telephoneResponsable]]">
+            <iron-icon src="./images/phone.png"></iron-icon>
+          </a>
+        </template>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    (function () {
+
+      /**
+       * Class to be used as a Template for new elements
+       * @polymer
+       */
+      class FSResourceListItem extends ReduxMixin(Polymer.Element) {
+
+        /**
+         * Defines the name of the element: <fs-resource-list-item></fs-resource-list-item>.
+         * @return {string} name that the element will use.
+         */
+        static get is() {
+          return 'fs-resource-list-item';
+        }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-resource-list-item
+                      resource=""
+                      selected="true"
+                      tabIndex="0">
+                   </fs-resource-list-item>
+         */
+        static get properties() {
+          return {
+            resource: {
+              type: String,
+              value: {}
+            },
+            selected: {
+              type: Boolean,
+              value: false
+            },
+            tabIndex: {
+              type: Number,
+              value: 0
+            }
+          };
+        }
+
+        getClassForItem(item, selected) {
+            return selected ? 'item expanded' : 'item';
+        }
+
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSResourceListItem.is, FSResourceListItem);
+
+    })();
+  </script>
+
+</dom-module>
