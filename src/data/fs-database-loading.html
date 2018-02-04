@@ -6,16 +6,8 @@
 <link rel="import" href="fs-rest-get.html">
 <link rel="import" href="fs-current-location.html">
 
-
 <dom-module id="fs-database-loading">
   <template>
-
-      <!-- FETCH DATA ON FIREBASE -->
-      <fs-data-loader
-        key="members"
-        load-action-name="LOAD_MEMBERS"
-        loaded-action-name="MEMBERS_LOADED">
-      </fs-data-loader>
 
       <!-- FETCH DATA ON FIREBASE -->
       <fs-data-loader
@@ -24,14 +16,7 @@
         loaded-action-name="RESOURCE_LOCATIONS_LOADED">
       </fs-data-loader>
 
-      <!-- REST API EXAMPLE TO FETCH DATA -->
-      <fs-rest-get
-          url="https://jsonplaceholder.typicode.com/posts"
-          key="testData"
-          load-action-name="LOAD_SOMETHING"
-          loaded-action-name="SOMETHING_LOADED">
-      </fs-rest-get>
-
+      <!-- FETCH CURRENT USER LOCATION -->
       <fs-current-location></fs-current-location>
   </template>
 
@@ -42,7 +27,7 @@
        * Loads data that is forwarded to the stored
        * @polymer
        */
-      class FSDatabaseLoading extends ReduxMixin(Polymer.Element) { // Custom element definition
+      class FSDatabaseLoading extends ReduxMixin(Polymer.Element) {
 
         /**
          * Defines the name of the element: <fs-database-loading></fs-database-loading>.
