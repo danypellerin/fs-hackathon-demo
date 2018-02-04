@@ -2,7 +2,8 @@
     (function() {
 
         const uiState = {
-            mapsLoaded: false
+            mapsLoaded: false,
+            currentLanguage: 'fr'
         };
 
         const uiStateReducer = (state = uiState, action) => {
@@ -12,6 +13,12 @@
                 case 'MAPS_API_READY':
                     return Object.assign({}, state, {
                         mapsLoaded: action.value
+                    });
+
+                case 'TOGGLE_LANGUAGE':
+                    var nextLanguage = state.currentLanguage === 'en' ? 'fr' : 'en';
+                    return Object.assign({}, state, {
+                        currentLanguage: nextLanguage
                     });
 
                 default:

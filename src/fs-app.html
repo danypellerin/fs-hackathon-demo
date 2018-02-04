@@ -27,6 +27,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="data/fs-database-loading.html">
 <link rel="import" href="fs-components/fs-network-status.html">
 <link rel="import" href="fs-components/fs-dea-list.html">
+<link rel="import" href="fs-components/fs-lang-toggle-button.html">
 
 <link rel="lazy-import" href="fs-view1.html">
 <link rel="lazy-import" href="fs-view2.html">
@@ -107,6 +108,21 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       h3 {
         margin-left: 15px;
       }
+
+      fs-lang-toggle-button {
+        position: absolute;
+        right: 15px;
+        top: 2px;
+        text-transform: uppercase;
+        --paper-toggle-button-checked-bar-color: rgb(66,133,244);
+        --paper-toggle-button-checked-button-color: rgb(66,133,244);
+        --paper-toggle-button-checked-ink-color: rgb(66,133,244);
+      }
+
+      .title {
+        position: relative;
+      }
+
     </style>
 
     <firebase-app
@@ -131,7 +147,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-drawer-layout fullbleed narrow="{{narrow}}">
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
-        <h3>Resources</h3>
+        <div class="title">
+          <h3>Resources</h3>
+          <fs-lang-toggle-button></fs-lang-toggle-button>
+        </div>
         <fs-dea-list></fs-dea-list>
       </app-drawer>
 
@@ -176,7 +195,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       static get properties() {
         return {
           language: {
-            value: 'en' //default language Value
+            value: 'en',
+            statePath: 'uiState.currentLanguage'
           },
           page: {
             type: String,

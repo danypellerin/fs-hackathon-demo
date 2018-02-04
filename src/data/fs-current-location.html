@@ -52,9 +52,14 @@
                     if(!userLocationSet) {
                         userLocationSet = true;
 
+                        var newLocation = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+
                         this.dispatch({
                             type: 'SELECTED_POSITION_CHANGED',
-                            value: position.coords
+                            value: newLocation
                         });
                     }
                 }

@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../redux-mixin.html">
+
+
+<dom-module id="fs-lang-toggle-button">
+    <style is="custom-style">
+
+    </style>
+  <template>
+    <paper-toggle-button on-tap="toggleLanguage">[[nextLanguage]]</paper-toggle-button>
+  </template>
+
+  <script>
+
+    (function () {
+
+      /**
+       * Button that is used to toggle the app language
+       * @polymer
+       */
+      class FSLangToggleButton extends ReduxMixin(Polymer.Element) {
+
+        /**
+         * Defines the name of the element: <fs-lang-toggle-button></fs-lang-toggle-button>.
+         * @return {string} name that the element will use.
+         */
+        static get is() { return 'fs-lang-toggle-button'; }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-lang-toggle-button
+                      prop1="something" >
+                   </fs-lang-toggle-button>
+         */
+        static get properties() {
+          return {
+            currentLanguage: {
+              type: String,
+              statePath: 'uiState.currentLanguage'
+            },
+            nextLanguage: {
+              type: String,
+              computed: 'languageChanged(currentLanguage)'
+            }
+          };
+        }
+
+        languageChanged(current) {
+          return current === 'fr' ? 'en' : 'fr';
+        }
+
+        toggleLanguage() {
+          this.dispatch({
+            type: 'TOGGLE_LANGUAGE'
+          });
+        }
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSLangToggleButton.is, FSLangToggleButton);
+
+    })();
+  </script>
+
+</dom-module>
