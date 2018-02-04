@@ -1,10 +1,8 @@
 <script>
     (function () {
         const initialLocalization = {
-            apptitle: {
-                en: "joyjoy",
-                fr: "joujou"
-            }
+            en: { appTitle: 'My name is {name}.' },
+            fr: { appTitle: 'Je m\'apelle {name}.' }
         };
         const localizationReducer = (state = initialLocalization, action) => {
 
