@@ -15,7 +15,7 @@
     </style>
 
     <google-map latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
-      <template is="dom-repeat" items="[[filteredDeas]]">
+      <template is="dom-repeat" items="[[filteredDeas]]" filter="[[resourceFilter]]">
         <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
           icon="../../images/aed.png"></google-map-marker>
       </template>
@@ -43,6 +43,14 @@
          */
         constructor() {
           super();
+        }
+
+        resourceFilter(item){
+          if (item.type === "DEA"){
+            return true;
+          }
+
+          return false;
         }
 
         /**
