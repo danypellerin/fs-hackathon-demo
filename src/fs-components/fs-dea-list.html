@@ -104,6 +104,7 @@
                         <div class="pad">
                             <span class="primary">[[dea.batiment]]</span>
                             <span class="shortInfo">distance: [[dea.distanceWalking]]</span>  
+                        	<span class="shortInfo">time walking: [[dea.timeWalking]]</span>
                             <template is="dom-if" if=[[dea.heures]]>
                                 <span class="shortInfo">distance: [[dea.distanceDriving]]</span>
                                 <span class="endshortInfo">[[dea.disponibility]]</span>
@@ -133,10 +134,10 @@
     <script>
         (function () { // IIFE
 
-            const userLocation = {
+            /*const userLocation = {
                 longitude: -72.6822718,
                 latitude: 46.6204874
-            };
+            };*/
             /**
              * Class to be used as a Template for new elements
              * @polymer
@@ -174,7 +175,7 @@
                         },
                         userLocation: {
                             type: Object,
-                            value: userLocation,
+                            statePath: "userLocation",
                             observer: "deaInfoChanged"
                         },
                         deaDetailedList: {
@@ -196,32 +197,74 @@
                     let deaList = this.deaList;
                     let userLocation = this.userLocation;
                     let deaDetailedList = [];
-                    let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.latitude + "," + userLocation.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
+                    let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.location.latitude + "," + userLocation.location.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
                     let distanceURLWalking = distanceURL + "&mode=Walking&destinations=";
                     let distanceURLDriving = distanceURL + "&mode=Driving&destinations=";
+                    let travelModeWalking = "Walking"
+                    let travelModeDriving = "Driving"
+
+                    let Index = 0;
+                    let jsonWalking;
+                    let jsonDriving;
+                    
+
+                    let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location.longitude);
+                    let directionsService = new google.maps.DirectionsService;
+                    let directionsDisplay = new google.maps.DirectionsRenderer;
+
+                    directionsService.route = 
+                    (
+                        {
+                            origin: originPoint,
+                            destination: originPoint,
+                            travelMode: 'DRIVING'
+                        },
+                        function(response, status) 
+                        {
+                            if (status === 'OK') {
+                                directionsDisplay.setDirections(response);
+                            } else {
+                                window.alert('Directions request failed due to ' + status);
+                            }
+                        }
+                    );
+
+                    /*directionsService.UnitSystem = UnitSystem.METRIC*/
 
                     this.deaList.forEach((dea) => {
                         //Building both URL to get the destinations
                         distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
                         distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
+                        dea.Id = Index++;
 
                     })
 
                     //Get JSON files with the list of destination information
-                    /*fetch(distanceURLWalking)
-                        .then(response => {
-                            console.log(response);
-                        });
-
-                    fetch(distanceURLDriving)
+                   /* fetch(distanceURLWalking)
                         .then(response => {
                             console.log(response);
                         });*/
 
+                    // fetch(distanceURLDriving)
+                    //     .then(response => {
+                    //         console.log(response);
+                    //     });
+
+                    /*
+                    fetch(distanceURLWalking).then(response => response.json().then(json => {jsonWalking = json}));
+                    fetch(distanceURLDriving).then(response => response.json().then(json => {jsonDriving = json}));
+                    */
+
                     this.deaList.forEach((dea) => {
                         //Add all items on the page
                         dea.distanceWalking = "1"
+                        dea.timeWalking = "1.1"
                         dea.distanceDriving = "2"
+                        dea.timeDriving = "2.2"
+                        //dea.distanceWalking = jsonWalking.element[dea.Id].distance.text
+                        //dea.distanceDriving = jsonDriving.element[dea.Id].distance.text
+                        //dea.timeWalking = jsonWalking.element[dea.Id].duration.text
+                        //dea.timeDriving = jsonDriving.element[dea.Id].duration.text
 
                         var time = dea.heures;
                         if (time == null) {
@@ -243,8 +286,6 @@
 
 
                         deaDetailedList.push(dea);
-
-                        // deaDetailedList.push()
                     })
                     this.deaDetailedList = deaDetailedList;
                 }
