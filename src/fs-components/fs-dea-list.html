@@ -230,13 +230,16 @@
                                 let timeNow = new Date();
                                 let openTime = new Date();
                                 let closeTime = new Date();
+                                let timeBeforeOpenWalking;                                  
+                                let timeBeforeCloseWalking;
 
                                 //Set Close and Open time
                                 closeTime.setHours(timeCloseDetails[0], timeCloseDetails[1], 0);
                                 openTime.setHours(timeOpenDetails[0], timeOpenDetails[1], 0);
 
                                 //Calculate how many minutes we have before it opened or closed
-                                timeBeforeClose = (timeNow - closeTime) / 1000 / 60
+                                timeBeforeClose = (timeNow - closeTime) / 1000 / 60;
+                                timeBeforeOpen = (timeNow - openTime) / 1000 / 60;
 
                                 if (timeBeforeOpen > 0 && timeBeforeClose < -15) {
                                     dea.disponibility = "open";
