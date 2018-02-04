@@ -21,6 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
 <link rel="import" href="fs-icons.html">
 <link rel="import" href="redux-mixin.html">
 <link rel="import" href="data/fs-database-loading.html">
@@ -131,7 +132,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <app-header slot="header" condenses reveals effects="waterfall">
           <app-toolbar>
-            <div main-title style="width:100%;">[[appName]]</div>
+            <div main-title style="width:100%;">[[localize('appName')]]</div>
             <!-- <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button> -->
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
             <div class="urgence-container">
@@ -160,11 +161,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <script>
-    class FsApp extends ReduxMixin(Polymer.Element) {
+    class FsApp extends Polymer.mixinBehaviors([Polymer.AppLocalizeBehavior],  ReduxMixin(Polymer.Element)) {
       static get is() { return 'fs-app'; }
 
       static get properties() {
         return {
+          language: {
+            value: 'en' //default language Value
+          },
           page: {
             type: String,
             reflectToAttribute: true,
@@ -179,7 +183,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String,
-        };
+        };        
       }
 
       static get observers() {
@@ -188,6 +192,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         ];
       }
 
+
       constructor() {
         super();
 
@@ -195,6 +200,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         // Log the state changes of the store in the console.
         this.addEventListener('state-changed', event => console.log('///--- APPLICATION STATE CHANGED ---///', this.getState()));
+        this.loadResources(this.resolveUrl('localization.json'));
       }
 
       _routePageChanged(page) {

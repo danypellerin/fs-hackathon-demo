@@ -1,0 +1,21 @@
+<script>
+    (function () {
+        const initialLocalization = {
+            en: { appTitle: 'My name is {name}.' },
+            fr: { appTitle: 'Je m\'apelle {name}.' }
+        };
+        const localizationReducer = (state = initialLocalization, action) => {
+
+            switch (action.type) {
+                case 'LOAD_LOCALIZATION':
+                    return action.value;
+
+                default:
+                    return state;
+            }
+        };
+
+        App.reducers.localization = localizationReducer;
+
+    })();
+</script>

@@ -1,0 +1,205 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+
+<dom-module id="fs-dea-list">
+    <template>
+
+        <!-- Styling here -->
+        <style>
+            :host {
+                display: block;
+            }
+
+
+            iron-list {
+                padding-top: 64px;
+                --iron-list-items-container: {
+                    max-width: 800px;
+                    margin: auto;
+                    margin-top: 60px;
+                    margin-bottom: 60px;
+                    border-bottom: 1px solid #ddd;
+                }
+                ;
+            }
+
+            .item {
+                @apply --layout-horizontal;
+                padding: 20px;
+                background-color: white;
+                border: 1px solid #ddd;
+                cursor: pointer;
+                margin-bottom: 10px;
+            }
+
+            .avatar {
+                height: 40px;
+                width: 40px;
+                border-radius: 20px;
+                box-sizing: border-box;
+                background-color: #DDD;
+            }
+
+            .pad {
+                padding: 0 16px;
+                @apply --layout-flex;
+                @apply --layout-vertical;
+            }
+
+            .primary {
+                font-size: 16px;
+                font-weight: bold;
+            }
+
+            .shortInfo,
+            .detailInfo {
+                font-size: 14px;
+            }
+
+            .detailInfo {
+                color: gray;
+                display: none;
+            }
+
+            .item:hover .shortInfo::after {
+                content: ' [+]';
+                color: gray;
+            }
+
+            .item.expanded:hover .shortInfo::after {
+                content: '';
+            }
+
+            .item.expanded .detailInfo {
+                display: block;
+            }
+
+            .item.expanded:hover .detailInfo::after {
+                content: '';
+            }
+
+            .spacer {
+                @apply --layout-flex;
+            }
+
+            @media (max-width: 460px) {
+                paper-toolbar .bottom.title {
+                    font-size: 14px;
+                }
+            }
+        </style>
+
+
+
+        <!-- HTML template here -->
+        <iron-list items="[[deaList]]" as="dea" selection-enabled multi-selection>
+            <template>
+                <div>
+                    <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
+                        <div class="pad">
+                            <div class="primary">Adress: [[dea.adresse]]</div>
+                            <span class="shortInfo">Open</span>
+                            <span class="detailInfo">batiment: [[dea.batiment]]</span>
+                            <span class="detailInfo">modele: [[dea.modele]]</span>
+                            <span class="detailInfo">source: [[dea.source]]</span>
+                        </div>
+                        <iron-icon src="../../images/phone.png"></iron-icon>
+                    </div>
+                </div>
+            </template>
+        </iron-list>
+    </template>
+
+
+
+    <script>
+        (function () { // IIFE
+
+            const userLocation = {
+                latidude: -72.6822718,
+                longitude: 46.6204874
+            };
+            /**
+             * Class to be used as a Template for new elements
+             * @polymer
+             */
+            class FSDeaList extends ReduxMixin(Polymer.Element) { // Custom element definition
+
+                /**
+                 * Defines the name of the element: <fs-dea-list></fs-dea-list>.
+                 * @return {string} name that the element will use.
+                 */
+                static get is() { return 'fs-dea-list'; }
+
+                /**
+                 * Constructor => Lifecycle
+                 * Initialization of some things could be done here
+                 */
+                constructor() {
+                    super();
+                    // Initialize things here
+                }
+
+                /**
+                 * @return {object} properties- Polymer properties
+                 * Useage: <fs-dea-list
+                              prop1="something" >
+                           </fs-dea-list>
+                 */
+                static get properties() {
+                    return {
+                        deaList: {
+                            type: Array,
+                            value: [],
+                            statePath: "deaLocations",
+                            oberver: "distance"
+                        },
+                        userLocation: {
+                            type: String,
+                            value: userLocation,
+                            observer: "userLocationChange"
+                        }
+                    };
+                }
+
+
+                /**
+                  * Example of a protected method.
+                  * @param {string} param - Some parameter.
+                  */
+                _doSomething(param) { }
+
+                distance(newvalue) {
+                    this.deaList.forEach()
+                }
+
+                userLocationChange(newValue, oldValue) {
+                    this.deaList.forEach((statePath) => {
+
+
+                    })
+                }
+
+                getClassForItem(item, selected) {
+                    return selected ? 'item expanded' : 'item';
+                }
+
+
+
+
+            }
+
+            // Registers the element in the browser
+            customElements.define(FSDeaList.is, FSDeaList);
+
+        })();
+    </script>
+
+</dom-module>
