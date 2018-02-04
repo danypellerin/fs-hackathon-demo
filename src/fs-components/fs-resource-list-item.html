@@ -10,81 +10,91 @@
       }
 
       .item {
-                @apply --layout-horizontal;
-                padding: 1.5em;
-                background-color: white;
-                border: 1px solid #ddd;
-                cursor: pointer;
-                margin-bottom: 10px;
-            }
+        @apply --layout-horizontal;
+        padding: 1.5em;
+        background-color: white;
+        cursor: pointer;
+      }
 
+      .item:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
 
+      .item:focus {
+        outline: none;
+        background: rgba(0, 0, 0, 0.15);
+      }
 
-            .pad {
-                padding: 0 1em;
-                @apply --layout-flex;
-                @apply --layout-vertical;
-            }
+      .pad {
+        padding: 0 1em;
+        @apply --layout-flex;
+        @apply --layout-vertical;
+      }
 
-            .primary {
-                font-size: 1em;
-                font-weight: bold;
-            }
+      .primary {
+        font-size: 1em;
+        font-weight: bold;
+      }
 
-            .shortInfo,
-            .endshortInfo,
-            .detailInfo {
-                font-size: 0.75em;
-            }
+      .short-info,
+      .end-short-info,
+      .detailed-info {
+        font-size: 0.75em;
+      }
 
-            .detailInfo {
-                color: gray;
-                display: none;
-            }
+      .detailed-info {
+        color: gray;
+        display: none;
+      }
 
-            .item:hover .endshortInfo::after {
-                content: ' [+]';
-                color: gray;
-            }
+      .item:hover .end-short-info::after {
+        content: ' [+]';
+        color: gray;
+      }
 
-            .item.expanded:hover .endshortInfo::after {
-                content: '';
-            }
+      .item.expanded:hover .end-short-info::after {
+        content: '';
+      }
 
-            .item.expanded .detailInfo {
-                display: block;
-            }
+      .item.expanded .detailed-info {
+        display: block;
+      }
 
-            .item.expanded .endshortInfo {
-                display: none;
-            }
+      .item.expanded .end-short-info {
+        display: none;
+      }
 
-            .item.expanded:hover .detailInfo::after {
-                content: '';
-            }
+      .item.expanded:hover .detailed-info::after {
+        content: '';
+      }
 
-            .spacer {
-                @apply --layout-flex;
-            }
+      .spacer {
+        @apply --layout-flex;
+      }
     </style>
 
     <div>
       <div class$="[[getClassForItem(resource, selected)]]" tabindex$="[[tabIndex]]">
         <div class="pad">
           <span class="primary">[[resource.batiment]]</span>
-          <span class="shortInfo">distance: [[resource.distanceWalking]]</span>
-          <span class="shortInfo">time walking: [[resource.timeWalking]]</span>
+          <span class="short-info">distance: [[resource.distanceWalking]]</span>
+          <span class="short-info">time walking: [[resource.timeWalking]]</span>
+
           <template is="dom-if" if=[[resource.heures]]>
-            <span class="shortInfo">distance: [[resource.distanceDriving]]</span>
-            <span class="endshortInfo">[[resource.disponibility]]</span>
+            <span class="short-info">distance: [[resource.distanceDriving]]</span>
+            <span class="end-short-info">[[resource.disponibility]]</span>
           </template>
+
           <template is="dom-if" if=[[!resource.heures]]>
-            <span class="endshortInfo">distance: [[resource.distanceDriving]]</span>
+            <span class="end-short-info">distance: [[resource.distanceDriving]]</span>
           </template>
-          <span class="detailInfo">Adress: [[resource.adresse]]</span>
-          <span class="detailInfo">[[resource.modele]]</span>
-          <span class="detailInfo">[[resource.source]]</span>
-          <span class="detailInfo">[[resource.ouverture]]</span>
+
+          <div class="detailed-info">
+            <span>Adress: [[resource.adresse]]</span>
+            <span>[[resource.modele]]</span>
+            <span>[[resource.source]]</span>
+            <span>[[resource.ouverture]]</span>
+          </div>
 
         </div>
         <template is="dom-if" if=[[resource.telephoneResponsable]]>
@@ -140,7 +150,7 @@
         }
 
         getClassForItem(item, selected) {
-            return selected ? 'item expanded' : 'item';
+          return selected ? 'item expanded' : 'item';
         }
 
       }
