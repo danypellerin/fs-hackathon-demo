@@ -21,7 +21,8 @@
     "google-map": "GoogleWebComponents/google-map#^2.0.3",
     "iron-list": "PolymerElements/iron-list#^2.0.12",
     "google-apis": "GoogleWebComponents/google-apis#^2.0.1",
-    "app-localize-behavior": "PolymerElements/app-localize-behavior#^2.0.0"
+    "app-localize-behavior": "PolymerElements/app-localize-behavior#^2.0.0",
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^2.0.0"
   },
   "resolutions": {
     "polymer": "^2.0.0"
