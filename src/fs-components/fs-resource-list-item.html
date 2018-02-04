@@ -86,16 +86,26 @@
       .spacer {
         @apply --layout-flex;
       }
+
+      .car {
+        height: 16px;
+        width: 16px;
+        margin-left: 5px;
+        margin-right: 3px;
+      }
+
     </style>
 
     <div>
       <div class$="[[getClassForItem(resource, selected)]] info-container" on-tap="setSelectedLocation">
         <div class="distance short-info">
             <div>
-              <span>[[resource.distanceWalking]]</span>
+              <iron-icon src="./images/walking.png"></iron-icon>
+              <span>[[resource.timeWalking]]</span>
             </div>
             <div>
-              <span>[[resource.timeWalking]]</span>
+              <iron-icon class="car" src="./images/car.png"></iron-icon>
+              <span>[[resource.timeDriving]]</span>
             </div>
         </div>
         <div class="info-content">
