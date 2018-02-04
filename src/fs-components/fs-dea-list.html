@@ -125,7 +125,7 @@
                     }));
 
                     let userLocation = this.userLocation;
-                    let selectedLocation = this.selectedLocation;
+                    let selectedLocation = this.selectedLocation || this.userLocation.location;
                     let deaDetailedList = [];
                     let travelModeWalking = "Walking"
                     let travelModeDriving = "Driving"

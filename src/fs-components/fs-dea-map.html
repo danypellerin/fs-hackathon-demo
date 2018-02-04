@@ -99,7 +99,7 @@
 
             infoWindow.push(new google.maps.InfoWindow(
               {
-                
+
                 content: "<span class=popup-detail>" +batiment + "<br>" + adresse + "<br>" + telephoneResponsable +"</span>",
                 position: {
                   lat: element.localisation.latitude,
@@ -148,10 +148,24 @@
             return;
           }
 
+
+
           if (position) {
-            this.calculatedPosition = position;
+
+            let newPosition = {
+              latitude: position.latitude,
+              longitude: position.longitude
+            }
+
+            this.calculatedPosition = newPosition;
           } else {
-            this.calculatedPosition = this.getState().userLocation.location;
+
+            let newerPosition = {
+              latitude: userLocation.location.latitude,
+              longitude: userLocation.location.longitude
+            }
+
+            this.calculatedPosition = newerPosition;
           }
         }
 
@@ -271,10 +285,10 @@
 
         clicked(e, detail, sender) {
           let id = parseInt(e.target.id.replace('marker-',''));
-          
+
          if(!infoWindow[id].view){
           infoWindow[id].open(this.$.googleMap, e.target);
-         }          
+         }
         }
       }
       // Registers the element in the browser
