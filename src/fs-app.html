@@ -42,6 +42,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       :host {
         --app-primary-color: #4285f4;
         --app-secondary-color: black;
+        --app-drawer-width: 330px;
         display: block;
       }
 
@@ -95,6 +96,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: black;
         font-weight: bold;
       }
+
+      .emergency iron-icon {
+        width: 48px;
+        height: 48px;
+        margin-right: 20px;
+        margin-top: 5px;
+      }
+
+      h3 {
+        margin-left: 15px;
+      }
     </style>
 
     <firebase-app
@@ -119,6 +131,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <app-drawer-layout fullbleed narrow="{{narrow}}">
       <!-- Drawer content -->
       <app-drawer id="drawer" slot="drawer" swipe-open="[[narrow]]">
+        <h3>Resources</h3>
         <fs-dea-list></fs-dea-list>
       </app-drawer>
 
@@ -132,7 +145,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <paper-icon-button icon="my-icons:menu" drawer-toggle></paper-icon-button>
             <div class="urgence-container">
               <a href="tel:18196684976">
-                <paper-button class="emergency">911</paper-button>
+                <paper-button class="emergency"><iron-icon src="./images/phone-64x64.png"></iron-icon>911</paper-button>
               </a>
           </div>
           </app-toolbar>

@@ -10,12 +10,10 @@
 <dom-module id="fs-dea-list">
     <template>
 
-        <!-- Styling here -->
         <style>
             :host {
                 display: block;
             }
-
 
             iron-list {
                 height: 93vh;
@@ -24,39 +22,36 @@
                     margin: auto;
                     max-height: 100%;
                     border-bottom: 1px solid #ddd;
-                }
-                ;
+                };
             }
-
-
 
             @media (max-width: 460px) {
                 paper-toolbar .bottom.title {
                     font-size: 14px;
                 }
             }
-        </style>
 
+            iron-list {
+                padding-top: 0;
+            }
+        </style>
 
 
         <!-- HTML template here -->
         <iron-list items="[[deaDetailedList]]" as="dea" selection-enabled multi-selection>
             <template>
-                <fs-resource-list-item resource="[[dea]]" selected="[[selected]]" tabIndex="[[tabIndex]]">
+                <fs-resource-list-item
+                    resource="[[dea]]"
+                    selected="[[selected]]"
+                    tabIndex="[[tabIndex]]">
                 </fs-resource-list-item>
             </template>
         </iron-list>
     </template>
 
-
-
     <script>
-        (function () { // IIFE
+        (function () {
 
-            /*const userLocation = {
-                longitude: -72.6822718,
-                latitude: 46.6204874
-            };*/
             /**
              * Class to be used as a Template for new elements
              * @polymer
@@ -67,22 +62,12 @@
                  * Defines the name of the element: <fs-dea-list></fs-dea-list>.
                  * @return {string} name that the element will use.
                  */
-                static get is() { return 'fs-dea-list'; }
-
-                /**
-                 * Constructor => Lifecycle
-                 * Initialization of some things could be done here
-                 */
-                constructor() {
-                    super();
-                    // Initialize things here
+                static get is() {
+                    return 'fs-dea-list';
                 }
 
                 /**
                  * @return {object} properties- Polymer properties
-                 * Useage: <fs-dea-list
-                              prop1="something" >
-                           </fs-dea-list>
                  */
                 static get properties() {
                     return {
@@ -115,21 +100,21 @@
                 }
 
                 mapsApiLoaded() {
-                    if(this.googleApiLoaded) {
+                    if (this.googleApiLoaded) {
                         this.deaInfoChanged(this.userLocation);
                     }
                 }
 
                 deaInfoChanged(newValue, oldValue) {
 
-                    if(!this.googleApiLoaded) {
+                    if (!this.googleApiLoaded) {
                         return;
                     }
 
                     this.deaList = [];
-                    
+
                     this.resourceList.forEach((resource => {
-                        if (resource.type === "DEA"){
+                        if (resource.type === "DEA") {
                             this.deaList.push(resource);
                         }
                     }));
@@ -144,29 +129,29 @@
                     let jsonDriving;
                     let responseOK;
 
-                    let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location.longitude);
+                    let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location
+                        .longitude);
                     let destinationPointList = [];
                     let directionsService = new google.maps.DirectionsService;
                     let directionsDisplay = new google.maps.DirectionsRenderer;
 
                     this.deaList.forEach((dea) => {
-                        destinationPointList.push(new google.maps.LatLng(dea.localisation.latitude, dea.localisation.longitude))
+                        destinationPointList.push(new google.maps.LatLng(dea.localisation.latitude,
+                            dea.localisation.longitude))
                     })
 
                     let service = new google.maps.DistanceMatrixService();
-                    service.getDistanceMatrix(
-                        {
-                            origins: [originPoint],//[origine1, origine2]
-                            destinations: destinationPointList,//[destinationA, destinationB],
-                            travelMode: 'WALKING',
-                        }, (response, status) => this.GetWalkingGeoStats(response, status));
+                    service.getDistanceMatrix({
+                        origins: [originPoint], //[origine1, origine2]
+                        destinations: destinationPointList, //[destinationA, destinationB],
+                        travelMode: 'WALKING',
+                    }, (response, status) => this.GetWalkingGeoStats(response, status));
 
-                    service.getDistanceMatrix(
-                        {
-                            origins: [originPoint],//[origine1, origine2]
-                            destinations: destinationPointList,//[destinationA, destinationB],
-                            travelMode: 'DRIVING',
-                        }, (response, status) => this.GetDrivingGeoStats(response, status));
+                    service.getDistanceMatrix({
+                        origins: [originPoint], //[origine1, origine2]
+                        destinations: destinationPointList, //[destinationA, destinationB],
+                        travelMode: 'DRIVING',
+                    }, (response, status) => this.GetDrivingGeoStats(response, status));
                 }
 
                 GetWalkingGeoStats(response, status) {
@@ -194,10 +179,9 @@
 
                         this.deaList.forEach((dea) => {
                             var time = dea.heures;
-                            if (time == null) {
-                            }
-                            else {
-                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
+                            if (time == null) {} else {
+                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures
+                                    .fin;
                                 var timeDetails = time.fin.split(":");
                                 var timeNow = new Date();
                                 var closeTime = new Date();
@@ -205,8 +189,7 @@
                                 closeTime.setHours(timeDetails[0], timeDetails[1], 0);
                                 if (timeNow < closeTime) {
                                     dea.disponibility = "Open";
-                                }
-                                else {
+                                } else {
                                     dea.disponibility = 'Closed';
                                 }
                             }
@@ -241,10 +224,9 @@
 
                         this.deaList.forEach((dea) => {
                             var time = dea.heures;
-                            if (time == null) {
-                            }
-                            else {
-                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
+                            if (time == null) {} else {
+                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures
+                                    .fin;
                                 var timeDetails = time.fin.split(":");
                                 var timeNow = new Date();
                                 var closeTime = new Date();
@@ -252,8 +234,7 @@
                                 closeTime.setHours(timeDetails[0], timeDetails[1], 0);
                                 if (timeNow < closeTime) {
                                     dea.disponibility = "Open";
-                                }
-                                else {
+                                } else {
                                     dea.disponibility = 'Closed';
                                 }
                             }
