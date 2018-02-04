@@ -24,8 +24,6 @@
                 --iron-list-items-container: {
                     margin: auto;
                     max-height: 100%;
-                    margin-top: 60px;
-                    margin-bottom: 60px;
                     border-bottom: 1px solid #ddd;
                 }
                 ;
@@ -105,20 +103,25 @@
                     <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
                         <div class="pad">
                             <span class="primary">[[dea.batiment]]</span>
+                            <span class="shortInfo">distance: [[dea.distanceWalking]]</span>  
+                            <template is="dom-if" if=[[dea.heures]]>
+                                <span class="shortInfo">distance: [[dea.distanceDriving]]</span>
+                                <span class="endshortInfo">[[dea.disponibility]]</span>
+                            </template>
+                            <template is="dom-if" if=[[!dea.heures]]>
+                                    <span class="endshortInfo">distance: [[dea.distanceDriving]]</span>
+                                </template>
                             <span class="detailInfo">Adress: [[dea.adresse]]</span>
-                            <span class="endshortInfo">[[dea.disponibility]]</span>
-                            <span class="detailInfo">Ouverture: [[dea.heures.debut]] - [[dea.heures.fin]]</span>
                             <span class="detailInfo">[[dea.modele]]</span>
                             <span class="detailInfo">[[dea.source]]</span>
-                            <span class="shortInfo">distance: [[dea.distanceWalking]]</span>
-                            <span class="shortInfo">distance: [[dea.distanceDriving]]</span>
+                            <span class="detailInfo">[[dea.ouverture]]</span>
+
                         </div>
-                        <template is="dom-if" if="[[dea.telephoneResponsable]]">
+                        <template is="dom-if" if=[[dea.telephoneResponsable]]>
                             <a href="tel:[[dea.telephoneResponsable]]">
                                 <iron-icon src="../../images/phone.png"></iron-icon>
                             </a>
                         </template>
-
                     </div>
                 </div>
             </template>
@@ -221,8 +224,10 @@
                         dea.distanceDriving = "2"
 
                         var time = dea.heures;
-                        if (time == null) { }
+                        if (time == null) {
+                        }
                         else {
+                            dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
                             var timeDetails = time.fin.split(":");
                             var timeNow = new Date();
                             var closeTime = new Date();
