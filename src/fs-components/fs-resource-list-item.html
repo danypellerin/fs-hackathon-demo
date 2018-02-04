@@ -11,7 +11,7 @@
 
       .item {
         @apply --layout-horizontal;
-        padding: 1.5em;
+        padding: 15px;
         background-color: white;
         cursor: pointer;
       }
@@ -23,12 +23,6 @@
       .item:focus {
         outline: none;
         background: rgba(0, 0, 0, 0.15);
-      }
-
-      .pad {
-        padding: 0 1em;
-        @apply --layout-flex;
-        @apply --layout-vertical;
       }
 
       .primary {
@@ -47,11 +41,6 @@
         display: none;
       }
 
-      .item:hover .end-short-info::after {
-        content: ' [+]';
-        color: gray;
-      }
-
       .item.expanded:hover .end-short-info::after {
         content: '';
       }
@@ -68,25 +57,52 @@
         content: '';
       }
 
+      .info-container {
+        display: flex;
+        justify-content: flex-start;
+        position: relative;
+      }
+
+      .info-container .distance {
+        width: 80px;
+        flex-shrink: 0;
+        margin-right: 5px;
+      }
+
+      .info-container .info-content {
+        width: 60%;
+      }
+
+      .phone-icon {
+        height: 36px;
+        width: 36px;
+      }
+
+      .phone-container {
+        position: absolute;
+        right: 5px;
+      }
+
       .spacer {
         @apply --layout-flex;
       }
     </style>
 
     <div>
-      <div class$="[[getClassForItem(resource, selected)]]" tabindex$="[[tabIndex]]">
-        <div class="pad">
+      <div class$="[[getClassForItem(resource, selected)]] info-container">
+        <div class="distance short-info">
+            <div>
+              <span>[[resource.distanceWalking]]</span>
+            </div>
+            <div>
+              <span>[[resource.timeWalking]]</span>
+            </div>
+        </div>
+        <div class="info-content">
           <span class="primary">[[resource.batiment]]</span>
-          <span class="short-info">distance: [[resource.distanceWalking]]</span>
-          <span class="short-info">time walking: [[resource.timeWalking]]</span>
 
           <template is="dom-if" if=[[resource.heures]]>
-            <span class="short-info">distance: [[resource.distanceDriving]]</span>
             <span class="end-short-info">[[resource.disponibility]]</span>
-          </template>
-
-          <template is="dom-if" if=[[!resource.heures]]>
-            <span class="end-short-info">distance: [[resource.distanceDriving]]</span>
           </template>
 
           <div class="detailed-info">
@@ -97,11 +113,13 @@
           </div>
 
         </div>
-        <template is="dom-if" if=[[resource.telephoneResponsable]]>
-          <a href="tel:[[resource.telephoneResponsable]]">
-            <iron-icon src="./images/phone.png"></iron-icon>
-          </a>
-        </template>
+        <div class="phone-container">
+          <template is="dom-if" if=[[resource.telephoneResponsable]]>
+            <a href="tel:[[resource.telephoneResponsable]]">
+              <iron-icon class="phone-icon" src="./images/phone.png"></iron-icon>
+            </a>
+          </template>
+        </div>
       </div>
     </div>
 
