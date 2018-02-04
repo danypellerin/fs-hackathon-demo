@@ -14,26 +14,23 @@
       }
     </style>
 
-    <google-map id="googleMap" latitude="[[position.latitude]]" longitude="[[position.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+    <google-map id="googleMap" latitude="[[calculatedPosition.latitude]]" longitude="[[calculatedPosition.longitude]]" zoom="[[defaultZoomLevel]]" styles="[[mapStyle]]" api-key="AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0">
+      <google-map-marker latitude="[[userPosition.latitude]]" longitude="[[userPosition.longitude]]" draggable="false" icon="../../images/position.png"> </google-map-marker>
       <!-- DEA -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterDea]]">
-        <google-map-marker id="marker-[[index]]" latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" click-events="true" on-google-map-marker-click="Clicked"
-          icon="../../images/aed.png">  </google-map-marker>
+        <google-map-marker id="marker-[[index]]" latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" click-events="true" on-google-map-marker-click="Clicked" icon="../../images/aed.png"> </google-map-marker>
       </template>
       <!-- Fire station -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterFireStation]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
-          icon="../../images/fire-station.png"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" icon="../../images/fire-station.png"></google-map-marker>
       </template>
       <!-- Police -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPolice]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
-          icon="../../images/police.png"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" icon="../../images/police.png"></google-map-marker>
       </template>
       <!-- Pharmacy -->
       <template is="dom-repeat" items="[[filteredDeas]]" filter="[[filterPharmacy]]">
-        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false"
-          icon="../../images/pharmacy.png"></google-map-marker>
+        <google-map-marker latitude="[[item.localisation.latitude]]" longitude="[[item.localisation.longitude]]" draggable="false" icon="../../images/pharmacy.png"></google-map-marker>
       </template>
     </google-map>
   </template>
@@ -93,6 +90,24 @@
           return false;
         }
 
+        targetPositionChanged(position) {
+          if (!this.googleApiLoaded){
+            return;
+          }
+
+          if (position) {
+            this.calculatedPosition = position;
+          } else {
+            this.calculatedPosition = this.getState().userLocation.location;
+          }
+        }
+
+        mapsApiLoaded() {
+          if (this.googleApiLoaded) {
+            this.targetPositionChanged(this.position);
+          }
+        }
+
         /**
          * @return {object} properties- Polymer properties
          * Useage: <fs-custom-element
@@ -114,7 +129,23 @@
             position: {
               type: Object,
               value: [],
-              statePath: "selectedLocation"
+              statePath: "selectedLocation",
+              observer: "targetPositionChanged"
+            },
+            userPosition: {
+              type: Object,
+              value: {},
+              statePath: "userLocation.location"
+            },
+            calculatedPosition: {
+              type: Object,
+              value: []
+            },
+            googleApiLoaded: {
+              type: Boolean,
+              value: false,
+              observer: 'mapsApiLoaded',
+              statePath: 'uiState.mapsLoaded'
             },
             mapStyle: {
               type: Array,
