@@ -86,6 +86,11 @@
                             statePath: "userLocation",
                             observer: "deaInfoChanged"
                         },
+                        currentLocation: {
+                            type: Object,
+                            statePath: "selectedLocation",
+                            observer: "deaInfoChanged"
+                        },
                         deaDetailedList: {
                             type: Array,
                             value: []
@@ -120,6 +125,7 @@
                     }));
 
                     let userLocation = this.userLocation;
+                    let selectedLocation = this.selectedLocation;
                     let deaDetailedList = [];
                     let travelModeWalking = "Walking"
                     let travelModeDriving = "Driving"
@@ -129,8 +135,7 @@
                     let jsonDriving;
                     let responseOK;
 
-                    let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location
-                        .longitude);
+                    let originPoint = new google.maps.LatLng(selectedLocation.latitude, selectedLocation.longitude);
                     let destinationPointList = [];
                     let directionsService = new google.maps.DirectionsService;
                     let directionsDisplay = new google.maps.DirectionsRenderer;
@@ -192,7 +197,7 @@
                                 if (dayIndex > -1){
                                     day = element.duration.text.substring(dayIndex-3,dayIndex-1);
                                 }
-                                
+
                                 this.deaList[j].timestampWalking = parseFloat(day*24*60) + parseFloat(hour*60) + parseFloat(minute)
 
                                 //If the duration is more than 1 hour, we show only ">1h"
@@ -228,10 +233,10 @@
                                 openTime.setHours(timeOpenDetails[0], timeOpenDetails[1], 0);
 
                                 //Calculate how many minutes we have before it open or clos
-                                timeBeforeOpen = (timeNow - openTime) / 1000 / 60 
+                                timeBeforeOpen = (timeNow - openTime) / 1000 / 60
                                 timeBeforeClose = (timeNow - closeTime) / 1000 / 60
 
-                                
+
                                 if (timeBeforeOpen > 0 && timeBeforeClose < -15) {
                                     dea.disponibility = "Open";
                                     dea.isOpen = 1;
@@ -286,7 +291,7 @@
                         result = _.sortByOrder(result,['isOpen', 'timestampWalking'], ['desc','asc']);
                         this.deaDetailedList = result;
                     }
-                }  
+                }
             }
 
             // Registers the element in the browser
