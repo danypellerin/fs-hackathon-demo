@@ -1,7 +1,6 @@
 <link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
 <script src="../node_modules/redux/dist/redux.js"></script>
 <link rel="import" href="reducers/app-info.reducer.html">
-<link rel="import" href="reducers/members.reducer.html">
 <link rel="import" href="reducers/ui-state.reducer.html">
 <link rel="import" href="reducers/dea.reducer.html">
 <link rel="import" href="reducers/data-loaded.reducer.html">
@@ -28,11 +27,18 @@
             },
             members: [],
             uiState: {},
-            deaReducer: [],
-            dataLoaded: {
-                membersLoaded: false
-            }
-        }
+            deaLocations: [],
+            localization: {
+                en: {
+                    appTitle: ''
+                },
+                fr: {
+                    appTitle: ''
+                }
+            },
+            dataLoaded: { }
+        };
+
     */
 
     ReduxMixin = (function() {
