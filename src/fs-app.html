@@ -26,6 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="redux-mixin.html">
 <link rel="import" href="data/fs-database-loading.html">
 <link rel="import" href="fs-components/fs-network-status.html">
+<link rel="import" href="fs-components/fs-dea-list.html">
 
 <link rel="lazy-import" href="fs-view1.html">
 <link rel="lazy-import" href="fs-view2.html">
@@ -136,15 +137,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           </div>
           </app-toolbar>
         </app-header>
-
+        <fs-dae-map></fs-dae-map>
         <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
             fallback-selection="view404"
             role="main">
           <fs-view1 name="view1"></fs-view1>
-          <fs-view2 name="view2"></fs-view2>
-          <fs-view3 name="view3"></fs-view3>
+          <!--fs-view2 name="view2"></fs-view2-->
+          <!-- <fs-view3 name="view3"></fs-view3> -->
           <fs-view404 name="view404"></fs-view404>
         </iron-pages>
       </app-header-layout>
