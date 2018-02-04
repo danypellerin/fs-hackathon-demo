@@ -32,9 +32,23 @@
       }
 
       .short-info,
-      .end-short-info,
       .detailed-info {
         font-size: 0.75em;
+      }
+
+      .end-short-info {
+        font-size: 0.75em;
+        color: green;
+      }
+
+      .end-short-infoClose{
+        font-size: 0.75em;
+        color: red;
+      }
+
+      .end-short-infoHurry{
+        font-size: 0.75em;
+        color: orange;
       }
 
       .detailed-info {
@@ -110,17 +124,14 @@
             </div>
         </div>
         <div class="info-content">
-          <span class="primary">[[resource.batiment]]</span>
-
-          <template is="dom-if" if=[[resource.heures]]>
-            <span class="end-short-info">[[resource.disponibility]]</span>
-          </template>
+          <div><span class="primary">[[resource.batiment]]</span></div>
+          <span class$="[[getClassForDisponibilityText(resource)]]">[[resource.disponibility]]</span>
 
           <div class="detailed-info">
-            <span>{{localize('address')}} [[resource.adresse]]</span>
-            <span>[[resource.modele]]</span>
-            <span>[[resource.source]]</span>
-            <span>[[resource.ouverture]]</span>
+            <div><span>[[resource.adresse]]</span></div>
+            <div><span>[[resource.modele]]</span></div>
+            <div><span>[[resource.source]]</span></div>
+            <div><span>[[resource.ouverture]]</span></div>
           </div>
 
         </div>
@@ -179,7 +190,24 @@
         }
 
         getClassForItem(item, selected) {
-          return selected ? 'item expanded' : 'item';
+          if (selected){
+            return 'item expanded';
+          }
+          else{
+            return 'item';
+          }
+        }
+
+        getClassForDisponibilityText(item) {
+          if (item.disponibility === 'Closed'){
+            return 'end-short-infoClose';
+          }
+          if (item.disponibility === 'Hurry'){
+            return 'end-short-infoHurry';
+          }
+          else{
+            return 'end-short-info';
+          }
         }
 
         setSelectedLocation() {

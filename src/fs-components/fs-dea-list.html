@@ -156,6 +156,13 @@
 
                 GetWalkingGeoStats(response, status) {
                     let result = [];
+                    let minute;
+                    let minuteIndex;
+                    let hour;
+                    let hourIndex;
+                    let day;
+                    let dayIndex;
+
                     if (status == 'OK') {
                         var origins = response.originAddresses;
                         var destinations = response.destinationAddresses;
@@ -163,14 +170,37 @@
                         for (var i = 0; i < origins.length; i++) {
                             var results = response.rows[i].elements;
                             for (var j = 0; j < results.length; j++) {
+                                let minute = 0;
+                                let hour = 0;
+                                let day = 0;
+
                                 var element = results[j];
                                 this.deaList[j].distanceWalking = element.distance.text;
 
-                                if (element.duration.text.search("heures") > -1){
-                                    this.deaList[j].timeWalking = ">1h"
+                                //Create a TimeStamp value for the order by later
+                                minuteIndex = element.duration.text.search("minute");
+                                if (minuteIndex > -1){
+                                    minute = element.duration.text.substring(minuteIndex-3,minuteIndex-1);
+                                }
+
+                                hourIndex = element.duration.text.search("heure");
+                                if (hourIndex > -1){
+                                    hour = element.duration.text.substring(hourIndex-3,hourIndex-1);
+                                }
+
+                                dayIndex = element.duration.text.search("day");
+                                if (dayIndex > -1){
+                                    day = element.duration.text.substring(dayIndex-3,dayIndex-1);
+                                }
+                                
+                                this.deaList[j].timestampWalking = parseFloat(day*24*60) + parseFloat(hour*60) + parseFloat(minute)
+
+                                //If the duration is more than 1 hour, we show only ">1h"
+                                if (element.duration.text.search("heure") > -1){
+                                    this.deaList[j].timeWalking = ">1h";
                                 }
                                 else{
-                                    this.deaList[j].timeWalking = element.duration.text
+                                    this.deaList[j].timeWalking = element.duration.text.replace("minutes","min").replace("minute","min");
                                 }
                                 var from = origins[i];
                                 var to = destinations[j];
@@ -178,23 +208,49 @@
                         }
 
                         this.deaList.forEach((dea) => {
-                            var time = dea.heures;
-                            if (time == null) {} else {
-                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures
-                                    .fin;
-                                var timeDetails = time.fin.split(":");
-                                var timeNow = new Date();
-                                var closeTime = new Date();
+                            let time = dea.heures;
+                            let timeBeforeOpen;
+                            let timeBeforeClose;
 
-                                closeTime.setHours(timeDetails[0], timeDetails[1], 0);
-                                if (timeNow < closeTime) {
+                            if (time != null) {
+                                dea.ouverture = 'Ouverture: ' + dea.heures.debut + ' - ' + dea.heures.fin;
+                                let timeCloseDetails = time.fin.split(":");
+                                let timeOpenDetails = time.debut.split(":");
+                                let timeNow = new Date();
+                                let openTime = new Date();
+                                let closeTime = new Date();
+
+                                //Add the walking time to now
+                                timeNow.setMinutes(timeNow.getMinutes() + dea.timestampWalking);
+
+                                //Set Close and Open time
+                                closeTime.setHours(timeCloseDetails[0], timeCloseDetails[1], 0);
+                                openTime.setHours(timeOpenDetails[0], timeOpenDetails[1], 0);
+
+                                //Calculate how many minutes we have before it open or clos
+                                timeBeforeOpen = (timeNow - openTime) / 1000 / 60 
+                                timeBeforeClose = (timeNow - closeTime) / 1000 / 60
+
+                                
+                                if (timeBeforeOpen > 0 && timeBeforeClose < -15) {
                                     dea.disponibility = "Open";
-                                } else {
-                                    dea.disponibility = 'Closed';
+                                    dea.isOpen = 1;
+                                } else if (timeBeforeOpen > 0 && timeBeforeClose > -15 && timeBeforeClose <= 0){
+                                    dea.disponibility = "Hurry";
+                                    dea.isOpen = 1;
                                 }
+                                else{
+                                    dea.disponibility = "Closed";
+                                    dea.isOpen = 0;
+                                }
+                            }
+                            else{
+                                dea.disponibility = "Open";
+                                dea.isOpen = 1;
                             }
                             result.push(dea);
                         });
+
                         this.deaDetailedList = result;
                     }
                 }
@@ -212,10 +268,10 @@
                                 this.deaList[j].distanceDriving = element.distance.text;
 
                                 if (element.duration.text.search("heures") > -1){
-                                    this.deaList[j].timeDriving = ">1h"
+                                    this.deaList[j].timeDriving = ">1h";
                                 }
                                 else{
-                                    this.deaList[j].timeDriving = element.duration.text
+                                    this.deaList[j].timeDriving = element.duration.text.replace("minutes","min").replace("minute","min");
                                 }
                                 var from = origins[i];
                                 var to = destinations[j];
@@ -223,26 +279,14 @@
                         }
 
                         this.deaList.forEach((dea) => {
-                            var time = dea.heures;
-                            if (time == null) {} else {
-                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures
-                                    .fin;
-                                var timeDetails = time.fin.split(":");
-                                var timeNow = new Date();
-                                var closeTime = new Date();
-
-                                closeTime.setHours(timeDetails[0], timeDetails[1], 0);
-                                if (timeNow < closeTime) {
-                                    dea.disponibility = "Open";
-                                } else {
-                                    dea.disponibility = 'Closed';
-                                }
-                            }
                             result.push(dea);
                         });
+
+                        //Sort the list by walking time desc
+                        result = _.sortByOrder(result,['isOpen', 'timestampWalking'], ['desc','asc']);
                         this.deaDetailedList = result;
                     }
-                }
+                }  
             }
 
             // Registers the element in the browser
