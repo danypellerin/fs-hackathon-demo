@@ -5,7 +5,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
-<script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+<link rel="import" href="./fs-resource-list-item.html">
 
 <dom-module id="fs-dea-list">
     <template>
@@ -14,11 +14,11 @@
         <style>
             :host {
                 display: block;
-
             }
 
 
             iron-list {
+                height: 93vh;
                 padding-top: 64px;
                 --iron-list-items-container: {
                     margin: auto;
@@ -28,63 +28,7 @@
                 ;
             }
 
-            .item {
-                @apply --layout-horizontal;
-                padding: 1.5em;
-                background-color: white;
-                border: 1px solid #ddd;
-                cursor: pointer;
-                margin-bottom: 10px;
-            }
 
-
-
-            .pad {
-                padding: 0 1em;
-                @apply --layout-flex;
-                @apply --layout-vertical;
-            }
-
-            .primary {
-                font-size: 1em;
-                font-weight: bold;
-            }
-
-            .shortInfo,
-            .endshortInfo,
-            .detailInfo {
-                font-size: 0.75em;
-            }
-
-            .detailInfo {
-                color: gray;
-                display: none;
-            }
-
-            .item:hover .endshortInfo::after {
-                content: ' [+]';
-                color: gray;
-            }
-
-            .item.expanded:hover .endshortInfo::after {
-                content: '';
-            }
-
-            .item.expanded .detailInfo {
-                display: block;
-            }
-
-            .item.expanded .endshortInfo {
-                display: none;
-            }
-
-            .item.expanded:hover .detailInfo::after {
-                content: '';
-            }
-
-            .spacer {
-                @apply --layout-flex;
-            }
 
             @media (max-width: 460px) {
                 paper-toolbar .bottom.title {
@@ -98,32 +42,8 @@
         <!-- HTML template here -->
         <iron-list items="[[deaDetailedList]]" as="dea" selection-enabled multi-selection>
             <template>
-                <div>
-                    <div class$="[[getClassForItem(dea, selected)]]" tabindex$="[[tabIndex]]">
-                        <div class="pad">
-                            <span class="primary">[[dea.batiment]]</span>
-                            <span class="shortInfo">distance: [[dea.distanceWalking]]</span>  
-                        	<span class="shortInfo">time walking: [[dea.timeWalking]]</span>
-                            <template is="dom-if" if=[[dea.heures]]>
-                                <span class="shortInfo">distance: [[dea.distanceDriving]]</span>
-                                <span class="endshortInfo">[[dea.disponibility]]</span>
-                            </template>
-                            <template is="dom-if" if=[[!dea.heures]]>
-                                    <span class="endshortInfo">distance: [[dea.distanceDriving]]</span>
-                                </template>
-                            <span class="detailInfo">Adress: [[dea.adresse]]</span>
-                            <span class="detailInfo">[[dea.modele]]</span>
-                            <span class="detailInfo">[[dea.source]]</span>
-                            <span class="detailInfo">[[dea.ouverture]]</span>
-
-                        </div>
-                        <template is="dom-if" if=[[dea.telephoneResponsable]]>
-                            <a href="tel:[[dea.telephoneResponsable]]">
-                                <iron-icon src="../../images/phone.png"></iron-icon>
-                            </a>
-                        </template>
-                    </div>
-                </div>
+                <fs-resource-list-item resource="[[dea]]" selected="[[selected]]" tabIndex="[[tabIndex]]">
+                </fs-resource-list-item>
             </template>
         </iron-list>
     </template>
@@ -166,6 +86,10 @@
                  */
                 static get properties() {
                     return {
+                        deaList: {
+                            type: Array,
+                            value: []
+                        },
                         resourceList: {
                             type: Array,
                             value: [],
@@ -202,104 +126,129 @@
                         return;
                     }
 
-                    let resourceList = this.resourceList;
+                    this.deaList = [];
+                    
+                    this.resourceList.forEach((resource => {
+                        if (resource.type === "DEA"){
+                            this.deaList.push(resource);
+                        }
+                    }));
+
                     let userLocation = this.userLocation;
                     let deaDetailedList = [];
-                    let distanceURL = "https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=" + userLocation.location.latitude + "," + userLocation.location.longitude + "&key=AIzaSyADLJNV3Ile3ysaqqwnZQ2baCSISmG1mj0"
-                    let distanceURLWalking = distanceURL + "&mode=Walking&destinations=";
-                    let distanceURLDriving = distanceURL + "&mode=Driving&destinations=";
                     let travelModeWalking = "Walking"
                     let travelModeDriving = "Driving"
 
                     let Index = 0;
                     let jsonWalking;
                     let jsonDriving;
-                    
+                    let responseOK;
 
                     let originPoint = new google.maps.LatLng(userLocation.location.latitude, userLocation.location.longitude);
+                    let destinationPointList = [];
                     let directionsService = new google.maps.DirectionsService;
                     let directionsDisplay = new google.maps.DirectionsRenderer;
 
-                    directionsService.route = 
-                    (
-                        {
-                            origin: originPoint,
-                            destination: originPoint,
-                            travelMode: 'DRIVING'
-                        },
-                        function(response, status) 
-                        {
-                            if (status === 'OK') {
-                                directionsDisplay.setDirections(response);
-                            } else {
-                                window.alert('Directions request failed due to ' + status);
-                            }
-                        }
-                    );
-
-                    /*directionsService.UnitSystem = UnitSystem.METRIC*/
-
-                    this.resourceList.forEach((dea) => {
-                        //Building both URL to get the destinations
-                        distanceURLWalking = distanceURLWalking + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
-                        distanceURLDriving = distanceURLDriving + dea.localisation.latitude + "," + dea.localisation.longitude + "|";
-                        dea.Id = Index++;
-
+                    this.deaList.forEach((dea) => {
+                        destinationPointList.push(new google.maps.LatLng(dea.localisation.latitude, dea.localisation.longitude))
                     })
 
-                    //Get JSON files with the list of destination information
-                   /* fetch(distanceURLWalking)
-                        .then(response => {
-                            console.log(response);
-                        });*/
+                    let service = new google.maps.DistanceMatrixService();
+                    service.getDistanceMatrix(
+                        {
+                            origins: [originPoint],//[origine1, origine2]
+                            destinations: destinationPointList,//[destinationA, destinationB],
+                            travelMode: 'WALKING',
+                        }, (response, status) => this.GetWalkingGeoStats(response, status));
 
-                    // fetch(distanceURLDriving)
-                    //     .then(response => {
-                    //         console.log(response);
-                    //     });
-
-                    /*
-                    fetch(distanceURLWalking).then(response => response.json().then(json => {jsonWalking = json}));
-                    fetch(distanceURLDriving).then(response => response.json().then(json => {jsonDriving = json}));
-                    */
-
-                    this.resourceList.forEach((dea) => {
-                        //Add all items on the page
-                        dea.distanceWalking = "1"
-                        dea.timeWalking = "1.1"
-                        dea.distanceDriving = "2"
-                        dea.timeDriving = "2.2"
-                        //dea.distanceWalking = jsonWalking.element[dea.Id].distance.text
-                        //dea.distanceDriving = jsonDriving.element[dea.Id].distance.text
-                        //dea.timeWalking = jsonWalking.element[dea.Id].duration.text
-                        //dea.timeDriving = jsonDriving.element[dea.Id].duration.text
-
-                        var time = dea.heures;
-                        if (time == null) {
-                        }
-                        else {
-                            dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
-                            var timeDetails = time.fin.split(":");
-                            var timeNow = new Date();
-                            var closeTime = new Date();
-
-                            closeTime.setHours(timeDetails[0], timeDetails[1], 0);
-                            if (timeNow < closeTime) {
-                                dea.disponibility = "Open";
-                            }
-                            else {
-                                dea.disponibility = 'Closed';
-                            }
-                        }
-
-
-                        deaDetailedList.push(dea);
-                    })
-                    this.deaDetailedList = deaDetailedList;
+                    service.getDistanceMatrix(
+                        {
+                            origins: [originPoint],//[origine1, origine2]
+                            destinations: destinationPointList,//[destinationA, destinationB],
+                            travelMode: 'DRIVING',
+                        }, (response, status) => this.GetDrivingGeoStats(response, status));
                 }
 
-                getClassForItem(item, selected) {
-                    return selected ? 'item expanded' : 'item';
+                GetWalkingGeoStats(response, status) {
+                    let result = [];
+                    if (status == 'OK') {
+                        var origins = response.originAddresses;
+                        var destinations = response.destinationAddresses;
+
+                        for (var i = 0; i < origins.length; i++) {
+                            var results = response.rows[i].elements;
+                            for (var j = 0; j < results.length; j++) {
+                                var element = results[j];
+                                this.deaList[j].distanceWalking = element.distance.text;
+                                this.deaList[j].timeWalking = element.duration.text;
+                                var from = origins[i];
+                                var to = destinations[j];
+                            }
+                        }
+
+                        this.deaList.forEach((dea) => {
+                            var time = dea.heures;
+                            if (time == null) {
+                            }
+                            else {
+                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
+                                var timeDetails = time.fin.split(":");
+                                var timeNow = new Date();
+                                var closeTime = new Date();
+
+                                closeTime.setHours(timeDetails[0], timeDetails[1], 0);
+                                if (timeNow < closeTime) {
+                                    dea.disponibility = "Open";
+                                }
+                                else {
+                                    dea.disponibility = 'Closed';
+                                }
+                            }
+                            result.push(dea);
+                        });
+                        this.deaDetailedList = result;
+                    }
+                }
+
+                GetDrivingGeoStats(response, status) {
+                    let result = [];
+                    if (status == 'OK') {
+                        var origins = response.originAddresses;
+                        var destinations = response.destinationAddresses;
+
+                        for (var i = 0; i < origins.length; i++) {
+                            var results = response.rows[i].elements;
+                            for (var j = 0; j < results.length; j++) {
+                                var element = results[j];
+                                this.deaList[j].distanceDriving = element.distance.text;
+                                this.deaList[j].timeDriving = element.duration.text;
+                                var from = origins[i];
+                                var to = destinations[j];
+                            }
+                        }
+
+                        this.deaList.forEach((dea) => {
+                            var time = dea.heures;
+                            if (time == null) {
+                            }
+                            else {
+                                dea.ouverture = 'Ouverture:' + dea.heures.debut + ' - ' + dea.heures.fin;
+                                var timeDetails = time.fin.split(":");
+                                var timeNow = new Date();
+                                var closeTime = new Date();
+
+                                closeTime.setHours(timeDetails[0], timeDetails[1], 0);
+                                if (timeNow < closeTime) {
+                                    dea.disponibility = "Open";
+                                }
+                                else {
+                                    dea.disponibility = 'Closed';
+                                }
+                            }
+                            result.push(dea);
+                        });
+                        this.deaDetailedList = result;
+                    }
                 }
             }
 

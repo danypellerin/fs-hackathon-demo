@@ -1,11 +1,22 @@
 <script>
 (function() {
+    const DEA_TYPE_NAME = "DEA";
+    const FIRE_STATION_TYPE_NAME = "fire_station";
+    const PHARMACY_TYPE_NAME = "pharmacy";
+    const POLICE_TYPE_NAME = "police";
 
     const resourceReducer = (state = [], action) => {
-
         switch (action.type) {
             case 'LOAD_RESOURCE_LOCATIONS':
-                return action.value;
+                let result = [];
+
+                action.value.forEach((resource) => {
+                    if (resource.type === DEA_TYPE_NAME || resource.type === FIRE_STATION_TYPE_NAME || resource.type === PHARMACY_TYPE_NAME || resource.tyoe === POLICE_TYPE_NAME){
+                        result.push(resource);
+                    }
+                });
+
+                return result;
 
             default:
                 return state;

@@ -1,0 +1,164 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../redux-mixin.html">
+
+<dom-module id="fs-resource-list-item">
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+
+      .item {
+        @apply --layout-horizontal;
+        padding: 1.5em;
+        background-color: white;
+        cursor: pointer;
+      }
+
+      .item:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .item:focus {
+        outline: none;
+        background: rgba(0, 0, 0, 0.15);
+      }
+
+      .pad {
+        padding: 0 1em;
+        @apply --layout-flex;
+        @apply --layout-vertical;
+      }
+
+      .primary {
+        font-size: 1em;
+        font-weight: bold;
+      }
+
+      .short-info,
+      .end-short-info,
+      .detailed-info {
+        font-size: 0.75em;
+      }
+
+      .detailed-info {
+        color: gray;
+        display: none;
+      }
+
+      .item:hover .end-short-info::after {
+        content: ' [+]';
+        color: gray;
+      }
+
+      .item.expanded:hover .end-short-info::after {
+        content: '';
+      }
+
+      .item.expanded .detailed-info {
+        display: block;
+      }
+
+      .item.expanded .end-short-info {
+        display: none;
+      }
+
+      .item.expanded:hover .detailed-info::after {
+        content: '';
+      }
+
+      .spacer {
+        @apply --layout-flex;
+      }
+    </style>
+
+    <div>
+      <div class$="[[getClassForItem(resource, selected)]]" tabindex$="[[tabIndex]]">
+        <div class="pad">
+          <span class="primary">[[resource.batiment]]</span>
+          <span class="short-info">distance: [[resource.distanceWalking]]</span>
+          <span class="short-info">time walking: [[resource.timeWalking]]</span>
+
+          <template is="dom-if" if=[[resource.heures]]>
+            <span class="short-info">distance: [[resource.distanceDriving]]</span>
+            <span class="end-short-info">[[resource.disponibility]]</span>
+          </template>
+
+          <template is="dom-if" if=[[!resource.heures]]>
+            <span class="end-short-info">distance: [[resource.distanceDriving]]</span>
+          </template>
+
+          <div class="detailed-info">
+            <span>Adress: [[resource.adresse]]</span>
+            <span>[[resource.modele]]</span>
+            <span>[[resource.source]]</span>
+            <span>[[resource.ouverture]]</span>
+          </div>
+
+        </div>
+        <template is="dom-if" if=[[resource.telephoneResponsable]]>
+          <a href="tel:[[resource.telephoneResponsable]]">
+            <iron-icon src="./images/phone.png"></iron-icon>
+          </a>
+        </template>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    (function () {
+
+      /**
+       * Class to be used as a Template for new elements
+       * @polymer
+       */
+      class FSResourceListItem extends ReduxMixin(Polymer.Element) {
+
+        /**
+         * Defines the name of the element: <fs-resource-list-item></fs-resource-list-item>.
+         * @return {string} name that the element will use.
+         */
+        static get is() {
+          return 'fs-resource-list-item';
+        }
+
+        /**
+         * @return {object} properties- Polymer properties
+         * Useage: <fs-resource-list-item
+                      resource=""
+                      selected="true"
+                      tabIndex="0">
+                   </fs-resource-list-item>
+         */
+        static get properties() {
+          return {
+            resource: {
+              type: String,
+              value: {}
+            },
+            selected: {
+              type: Boolean,
+              value: false
+            },
+            tabIndex: {
+              type: Number,
+              value: 0
+            }
+          };
+        }
+
+        getClassForItem(item, selected) {
+          return selected ? 'item expanded' : 'item';
+        }
+
+      }
+
+      // Registers the element in the browser
+      customElements.define(FSResourceListItem.is, FSResourceListItem);
+
+    })();
+  </script>
+
+</dom-module>
