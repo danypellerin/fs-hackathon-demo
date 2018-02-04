@@ -3,19 +3,7 @@
 
 <dom-module id="fs-current-location">
     <template>
-
-        <!-- Styling here -->
-        <style>
-            :host {
-                display: block;
-            }
-        </style>
-
-        <!-- HTML template here -->
-        <h2>Hello [[userLocation]]!</h2>
-
-        <app-indexeddb-mirror key="[[currentUserLocation]]" data="{{userLocation}}" persisted-data="{{persistedData}}">
-        </app-indexeddb-mirror>
+        <app-indexeddb-mirror key="[[currentUserLocation]]" data="{{userLocation}}" persisted-data="{{persistedData}}"></app-indexeddb-mirror>
     </template>
 
     <script>

@@ -3,6 +3,26 @@
       "dea":{
         ".read": true,
         ".write": false
+      },
+      "resource":{
+        ".read": true,
+        ".write": false
+      },
+      "resourceTypes":{
+        ".read": true,
+        ".write": false
+      },
+      "secouriste":{
+        ".read": true,
+        ".write": false
+      },
+      "typeUrgence":{
+        ".read": true,
+        ".write": false
+      },
+      "urgence":{
+        ".read": true,
+        ".write": false
       }
     }
 }
