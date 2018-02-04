@@ -197,10 +197,10 @@
 
                                 //If the duration is more than 1 hour, we show only ">1h"
                                 if (element.duration.text.search("heure") > -1){
-                                    this.deaList[j].timeWalking = ">1h"
+                                    this.deaList[j].timeWalking = ">1h";
                                 }
                                 else{
-                                    this.deaList[j].timeWalking = element.duration.text
+                                    this.deaList[j].timeWalking = element.duration.text.replace("minutes","min").replace("minute","min");
                                 }
                                 var from = origins[i];
                                 var to = destinations[j];
@@ -268,10 +268,10 @@
                                 this.deaList[j].distanceDriving = element.distance.text;
 
                                 if (element.duration.text.search("heures") > -1){
-                                    this.deaList[j].timeDriving = ">1h"
+                                    this.deaList[j].timeDriving = ">1h";
                                 }
                                 else{
-                                    this.deaList[j].timeDriving = element.duration.text
+                                    this.deaList[j].timeDriving = element.duration.text.replace("minutes","min").replace("minute","min");
                                 }
                                 var from = origins[i];
                                 var to = destinations[j];
